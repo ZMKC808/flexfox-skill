@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Create and verify WeChat Official Account drafts from FlexFox charcoal HTML.
 
-Secrets live only in the ignored local config file. This program never logs an
-access token or secret, and it refuses to create a draft without an explicit
-command-line confirmation.
+Supports both remote HTTPS images and local relative/absolute image files.
+Local image files are automatically uploaded to WeChat CDN via /media/uploadimg,
+and replaced with their WeChat CDN URLs in the draft HTML.
+Secrets live only in the ignored local config file.
 """
 
 from __future__ import annotations
@@ -91,9 +92,6 @@ def access_token(config: dict[str, str]) -> tuple[str, int]:
 
 
 def download_image(url: str) -> tuple[bytes, str]:
-    parsed = urllib.parse.urlparse(url)
-    if parsed.scheme not in {"https", "http"}:
-        raise WeChatError(f"Unsupported image source: {parsed.scheme or 'relative path'}")
     request = urllib.request.Request(url, headers={"User-Agent": "FlexFox-WeChat-Draft/1.0"})
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
@@ -105,8 +103,39 @@ def download_image(url: str) -> tuple[bytes, str]:
         raise WeChatError(f"Body image exceeds {MAX_DOWNLOAD_BYTES // 1024 // 1024} MB: {url}")
     if not content_type.startswith("image/"):
         raise WeChatError(f"Body image is not an image response: {url}")
-    extension = mimetypes.guess_extension(content_type) or Path(parsed.path).suffix or ".png"
+    extension = mimetypes.guess_extension(content_type) or Path(urllib.parse.urlparse(url).path).suffix or ".png"
     return data, extension
+
+
+def load_or_download_image(source: str, base_dir: Path | None = None) -> tuple[bytes, str]:
+    parsed = urllib.parse.urlparse(source)
+    if parsed.scheme in {"https", "http"}:
+        return download_image(source)
+
+    # Resolve local image relative to base_dir or absolute path
+    clean = source[7:] if source.startswith("file://") else source
+    clean_path = Path(clean)
+
+    local_path = None
+    if base_dir and (base_dir / clean_path).is_file():
+        local_path = (base_dir / clean_path).resolve()
+    elif clean_path.is_file():
+        local_path = clean_path.resolve()
+    elif base_dir:
+        for sub in ("images", "图片"):
+            candidate = base_dir / sub / clean_path.name
+            if candidate.is_file():
+                local_path = candidate.resolve()
+                break
+
+    if not local_path or not local_path.is_file():
+        raise WeChatError(f"Local image not found: {source} (resolved against {base_dir})")
+
+    data = local_path.read_bytes()
+    if len(data) > MAX_DOWNLOAD_BYTES:
+        raise WeChatError(f"Local image exceeds {MAX_DOWNLOAD_BYTES // 1024 // 1024} MB: {local_path}")
+    ext = local_path.suffix.lower() or ".png"
+    return data, ext
 
 
 def multipart_upload(
@@ -142,8 +171,8 @@ def multipart_upload(
     return result
 
 
-def upload_inline_image(token: str, source: str) -> str:
-    data, extension = download_image(source)
+def upload_inline_image(token: str, source: str, base_dir: Path | None = None) -> str:
+    data, extension = load_or_download_image(source, base_dir=base_dir)
     try:
         result = multipart_upload(
             f"{API_ROOT}/media/uploadimg",
@@ -154,10 +183,10 @@ def upload_inline_image(token: str, source: str) -> str:
             mimetypes.guess_type("body" + extension)[0] or "image/png",
         )
     except WeChatError as error:
-        raise WeChatError(f"Body-image upload failed: {error}") from error
+        raise WeChatError(f"Body-image upload failed ({source}): {error}") from error
     url = result.get("url")
     if not isinstance(url, str) or not url:
-        raise WeChatError("WeChat did not return a usable body-image URL")
+        raise WeChatError(f"WeChat did not return a usable body-image URL for {source}")
     return url
 
 
@@ -188,9 +217,9 @@ def upload_cover(token: str, cover: Path) -> str:
     return media_id
 
 
-def replace_images(token: str, html: str) -> tuple[str, int]:
-    if "data:" in html or "file:" in html:
-        raise WeChatError("Charcoal layout contains data/local images. Use only remote https body images.")
+def replace_images(token: str, html: str, base_dir: Path | None = None) -> tuple[str, int]:
+    if "data:image/" in html:
+        raise WeChatError("Charcoal layout contains raw base64 data URIs. Use local file paths or remote URLs instead.")
     cache: dict[str, str] = {}
     count = 0
 
@@ -198,7 +227,7 @@ def replace_images(token: str, html: str) -> tuple[str, int]:
         nonlocal count
         source = match.group(2)
         if source not in cache:
-            cache[source] = upload_inline_image(token, source)
+            cache[source] = upload_inline_image(token, source, base_dir=base_dir)
         count += 1
         return match.group(1) + cache[source] + match.group(3)
 
@@ -270,7 +299,7 @@ def command_validate(config: dict[str, str]) -> None:
 
 def command_draft(args: argparse.Namespace, config: dict[str, str]) -> None:
     if not args.confirm_draft:
-        die("Refusing to create a draft without --confirm-draft.")
+        die("Refusing to create draft without --confirm-draft.")
     article_dir = args.article_dir.resolve()
     if not article_dir.is_dir():
         die(f"Article directory does not exist: {article_dir}")
@@ -282,8 +311,13 @@ def command_draft(args: argparse.Namespace, config: dict[str, str]) -> None:
         die(f"No rendered-body source at {body}. Run scripts/prepare_wechat_body.py first.")
     html = render_file(body)
     token, _ = access_token(config)
-    rendered, image_count = replace_images(token, html)
+    rendered, image_count = replace_images(token, html, base_dir=article_dir)
     cover = args.cover.resolve() if args.cover else article_dir / "images/cover-900x383.png"
+    if not cover.is_file():
+        for candidate_cover in (article_dir / "图片/封面-900x383.png", article_dir / "封面-900x383.png"):
+            if candidate_cover.is_file():
+                cover = candidate_cover
+                break
     cover_media_id = upload_cover(token, cover)
     media_id = create_draft(
         token,
@@ -295,37 +329,35 @@ def command_draft(args: argparse.Namespace, config: dict[str, str]) -> None:
         show_cover_pic=int(config.get("FLEXFOX_WECHAT_SHOW_COVER_PIC", "0")),
     )
     verified = verify_draft(token, media_id)
-    saved = receipt(article_dir, media_id, rendered, image_count, verified)
-    print(f"Draft created and {'verified' if verified else 'not verified'}; receipt: {saved}")
-
-
-def parse_args() -> argparse.Namespace:
-    root = Path(__file__).resolve().parent.parent
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=root / "config/wechat.local.env")
-    subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("validate", help="verify local credentials without creating a draft")
-    draft = subparsers.add_parser("draft", help="render the prepared charcoal body and upload it into the draft box")
-    draft.add_argument("--article-dir", type=Path, required=True)
-    draft.add_argument("--title", required=True)
-    draft.add_argument("--digest", help="override digest.md; omit to use the article's digest.md")
-    draft.add_argument("--author")
-    draft.add_argument("--cover", type=Path)
-    draft.add_argument("--body", type=Path, help="override the default article-dir/wechat-body.md")
-    draft.add_argument("--confirm-draft", action="store_true")
-    return parser.parse_args()
+    out_receipt = receipt(article_dir, media_id, rendered, image_count, verified)
+    state = "verified" if verified else "created without readback confirmation"
+    print(f"Delivered draft to WeChat ({state}): {out_receipt}")
 
 
 def main() -> None:
-    args = parse_args()
+    root = Path(__file__).resolve().parent.parent
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    validate_parser = subparsers.add_parser("validate", help="Validate credentials and token fetch")
+    validate_parser.add_argument("--config", type=Path, default=root / "config/wechat.local.env")
+
+    draft_parser = subparsers.add_parser("draft", help="Deliver an article to the WeChat draft box")
+    draft_parser.add_argument("--article-dir", type=Path, required=True)
+    draft_parser.add_argument("--title", required=True)
+    draft_parser.add_argument("--digest", default=None)
+    draft_parser.add_argument("--author", default=None)
+    draft_parser.add_argument("--body", type=Path, default=None)
+    draft_parser.add_argument("--cover", type=Path, default=None)
+    draft_parser.add_argument("--config", type=Path, default=root / "config/wechat.local.env")
+    draft_parser.add_argument("--confirm-draft", action="store_true", default=False)
+
+    args = parser.parse_args()
     config = parse_env(args.config)
-    try:
-        if args.command == "validate":
-            command_validate(config)
-        else:
-            command_draft(args, config)
-    except WeChatError as error:
-        die(str(error))
+    if args.command == "validate":
+        command_validate(config)
+    elif args.command == "draft":
+        command_draft(args, config)
 
 
 if __name__ == "__main__":

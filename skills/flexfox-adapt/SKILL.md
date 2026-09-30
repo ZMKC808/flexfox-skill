@@ -3,25 +3,101 @@ name: flexfox-adapt
 description: Use when the user provides a WeChat article, X/Twitter post, or other source link and wants an original FlexFox WeChat article derived from it, rather than a summary or repost.
 ---
 
-# FlexFox 二创
+# FlexFox 二创：低重合率重构流水线
 
-This is a source-import mode for the ordinary FlexFox writing chain, not a second writer persona. Its output must give AI飞升录 readers a new angle, new structure and account-specific judgment; it must not translate, paraphrase paragraph by paragraph, or imitate the source structure.
+二创不是洗稿，也不是逐段翻译和同义词替换。二创的目标是：**借用事实与证据图，通过账号特有的立场卡反转立论，用灵动狐时间轴彻底重构叙事，使全文查重率严格控制在 30% 以下，产出完全具有独立版权与个人灵魂的原创长文。**
 
-## Import the source
+---
 
-1. Save the source URL and author/account in `evidence.md` before drafting.
-2. For a public `mp.weixin.qq.com` link, use `wechat-article-to-markdown` when available; it downloads the article and its images into the current article project's `source/` folder. If it is unavailable or blocked, read the page with another real extractor and record the failure.
-3. For an X/Twitter link or thread, read the complete post/thread and record the original URL, author, timestamps and claims. Download media only when it is necessary evidence and rights permit reuse.
-4. Treat source images as evidence, not free stock. Use them in the new article only with clear reuse permission, attribution where needed, and a remote delivery URL. Otherwise describe the fact or find an approved replacement.
+## 核心流程：四大重构关口
 
-## Rebuild, do not wash
+```text
+原始素材 (链接/图片) ──[1. 抓取与清洗]──> 裸事实与证据图清单
+                                             │
+                                     [2. 立场卡乘法]
+                                             ▼
+全新大纲 ──[4. 灵动狐时间轴填肉]──<──[3. 物理隔离与立论反转]
+    │
+    └──> [5. 反洗稿查重门禁] (重合度 < 30%)
+```
 
-Before writing, create `adaptation.md` with:
+---
 
-- source facts that have been independently checked;
-- the reader problem this source reveals;
-- the new AI飞升录 angle, scene or test;
-- facts/images that cannot be reused;
-- the one-line credit or attribution plan if the source is named.
+### 第一步：抓取与物理隔离（只喂事实，断绝语序模仿）
 
-Then continue through `flexfox-research` → Brief confirmation → `flexfox-writer` → `flexfox-ai-check` → title, digest, cover and delivery. Keep direct quotation short and attributed. If the source is too thin to support a distinct article, stop at an annotated idea instead of padding it into a rewrite.
+1. **执行抓取**：
+   运行统一抓取脚本，将原文与图片保存至当前项目的 `过程/来源/`：
+   ```bash
+   python3 scripts/fetch_source.py <URL> -o articles/YYYY-MM-DD-主题/过程/来源
+   ```
+2. **事实提纯（物理隔离）**：
+   从 `过程/来源/source.md` 中提炼事实，输出到 `过程/evidence.md`。
+   - 只记录裸事实：产品名、功能参数、价格、限制条件、报错信息、实操步骤、核心数据。
+   - **铁律**：严禁保留原文的修辞、形容词、过渡段落和叙事顺序。
+   - **正文动笔时，AI 严禁读取原文 `source.md`，只能读取 `evidence.md`！** 从物理层面上断绝文本与语序的雷同。
+
+---
+
+### 第二步：原图清洗与证据绑定
+
+抓取下来的原始配图必须经过清洗与证据标记：
+
+1. **剔除垃圾图**：
+   - 必须删除：原作者头像、引流二维码、1×1 像素打点图、底部求关注动图、广告海报。
+2. **保留证据图**：
+   - 保留具有客观信息量的界面截图、配置代码、真实报错、账单截图、性能对比图。
+   - 将保留的证据图复制到当前项目的 `图片/` 目录下（按 `01-xx.png`, `02-xx.png` 命名）。
+3. **输出图片证据清单（`过程/image-manifest.md`）**：
+   - 记录每张图对应的序号、证明的具体事实，以及在正文哪个环节引用。
+4. **正文叙事呼应**：
+   - 写作时在正文精准插入：`![证据说明](图片/01-xx.png)`。
+   - 正文必须指代图中的具体信息（如“看图中红框处的这一项……”），图文紧密配合。
+
+---
+
+### 第三步：立场乘法（立意 180 度大反转）
+
+**公式：原文立论 × 账号立场卡 = 换角度后的全新判断。**
+
+* **原文倾向**：多数媒体或官方文章是公关宣传视角（宏大叙事、吹捧功能强大、宣称颠覆行业）；
+* **账号立场**（AI飞升录）：技术纯小白、动手派、白嫖党、成本敏感、反信息差割韭菜。
+* **立论转化示例**：
+  * *原文立论*：“某大厂推出全新开源框架，全面革新开发范式。”
+  * *立场乘法*：“大厂又在画饼，我花了两小时跑通后发现，显存要求高得离谱，普通人的电脑根本跑不动，今天拆解它隐藏的算力账本。”
+* **产出**：将全新的一句话主线（写给谁、核心反直觉观点、坚决不聊什么）写入 `过程/brief.md`，供用户确认。
+
+---
+
+### 第四步：灵动狐时间轴重构（打碎原文目录）
+
+**绝对禁止**使用原文的一、二、三级小标题或段落节奏。必须强制套用 FlexFox 镜头演进时间链：
+
+```text
+前天深夜刷到一个离谱更新
+  ↓ (镜头切换)
+第一反应：大厂又在吹牛
+  ↓ (时间推进：今早9点)
+花了两小时手搓实测
+  ↓ (遇到摩擦与报错)
+卡在第三步，发现文档里没写的隐性限制
+  ↓ (深挖细节)
+算完真实成本与账本，发现真正的套路
+  ↓ (收束)
+回到读者当下：普通人怎么避坑 / 怎么白嫖
+```
+
+由于逻辑主线、章节结构与叙事节奏完全由时间推进重构，全篇架构与原文毫无重叠。
+
+---
+
+### 第五步：反洗稿与查重硬门禁（质检必查）
+
+在进入 `review.md` 质检时，执行以下查重门禁。任何一项不合格，退回重修：
+
+1. **结构独立性**：小标题字数控制在 4～6 字，且小标题与原文小标题语义重合度为 0；
+2. **连续字符拦截**：正文中严禁出现连续 13 个字以上与原文雷同的句子；
+3. **首尾段独立性**：开头钩子（直接切入事件）与结尾收束完全基于本账号立场重写；
+4. **摩擦细节充足**：必须包含至少 1～2 个原文没有提及的真实摩擦或上手成本细节；
+5. **重合率判定**：综合文字相似度与句式重合率必须低于 30%。
+
+通过此流水线后，继续进入 `flexfox-writer` 生成正文、质检、排版与草稿箱投递。

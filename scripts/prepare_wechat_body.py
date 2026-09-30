@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create the local charcoal-layout body with AI飞升录's fixed opening."""
+"""Create the local charcoal-layout body with opening greeting and clean markdown."""
 
 from __future__ import annotations
 
@@ -29,9 +29,10 @@ def body_without_title(markdown: str) -> str:
 
 
 def validate_image_sources(markdown: str) -> None:
-    invalid = [url for url in IMAGE.findall(markdown) if not url.startswith("https://")]
+    # Only reject raw base64 data URIs that bloat the document; local paths and https URLs are allowed!
+    invalid = [url for url in IMAGE.findall(markdown) if url.startswith("data:image/")]
     if invalid:
-        raise SystemExit("Error: body images must use approved https URLs, not local paths or base64.")
+        raise SystemExit("Error: body images should not be raw base64 data URIs. Use local paths (e.g. images/01.png) or remote URLs.")
 
 
 def main() -> None:
@@ -42,16 +43,28 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=root / "config/wechat.local.env")
     args = parser.parse_args()
 
-    config = parse_env(args.config)
+    config = {}
+    if args.config.is_file():
+        try:
+            config = parse_env(args.config)
+        except Exception:
+            pass
+
     gif_url = config.get("FLEXFOX_WECHAT_INTRO_GIF_URL", "")
-    if not gif_url.startswith("https://"):
-        raise SystemExit("Error: no opening GIF URL. Run scripts/sync_intro_gif.py first.")
     markdown = args.article.read_text(encoding="utf-8")
     body = body_without_title(markdown)
     if not body:
         raise SystemExit("Error: article has no body after its title.")
     validate_image_sources(body)
-    output = f"![AI飞升录开场动图]({gif_url})\n\n{OPENING}\n\n{body.rstrip()}\n"
+
+    header_parts = []
+    if gif_url.startswith("https://") or gif_url.startswith("http://"):
+        header_parts.append(f"![AI飞升录开场动图]({gif_url})\n")
+    header_parts.append(f"{OPENING}\n")
+
+    prefix = "\n".join(header_parts)
+    output = f"{prefix}\n{body.rstrip()}\n"
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(output, encoding="utf-8")
     print(f"Prepared WeChat body: {args.output}")
 

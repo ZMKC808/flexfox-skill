@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0
+
+- Add unified scraper `scripts/fetch_source.py` supporting both WeChat articles and Twitter/X posts (with automatic image extraction).
+- Overhaul `scripts/wechat_draft.py` to seamlessly accept local relative image paths (`images/` or `图片/`), automatically uploading them to WeChat Official CDN via `/media/uploadimg` without requiring third-party image hosting.
+- Upgrade `skills/flexfox-adapt` with a strict 4-step deconstruction and stance multiplication pipeline to guarantee under 30% repetition rate and prevent text-spinning.
+- Upgrade `profiles/ai-feishenglu.md` with authentic language fingerprints, wild analogies, friction rules, and strict 2-4 spot bolding discipline extracted from historical published articles.
+- Update `scripts/prepare_wechat_body.py` to permit local images and gracefully handle missing intro GIF configurations.
+- Update `references/output-contract.md` to standardize local image usage throughout the authoring and review lifecycle.
+
 ## 0.5.0
 
 - Replace the browser-dependent Flowcast adapter with `flexfox-charcoal-layout`, a self-contained charcoal inline-HTML renderer.
