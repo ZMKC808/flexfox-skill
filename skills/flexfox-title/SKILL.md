@@ -3,40 +3,66 @@ name: flexfox-title
 description: Use when generating, researching, selecting, or revising titles for a FlexFox WeChat Official Account article.
 ---
 
-# FlexFox 标题
+# FlexFox 标题工程（挑拨学与高点击率矩阵）
 
-Read the article Brief, evidence, Profile, and first effective paragraph before writing titles. A title earns a click from the right reader and must begin delivering its promise within the first 100 words.
+标题是文章唯一的门面，它的核心使命是**从目标读者池中精准筛选注意力，激发不可抑制的点击欲与讨论欲**。标题的承诺必须在前 100 字内开始兑现。
 
-Write `title-options.md` with:
+---
+
+## 标题五大杀手锏模型（候选标题必须覆盖）
+
+每次起标题，必须基于 `brief.md` 中的 A vs B 冲突舞台，输出至少 5 个候选标题，且必须包含以下模型：
+
+### 1. 利益不对等 / 挑拨型（A vs B 矛盾撕扯）
+- **逻辑**：将一方高高在上的公关做派，与另一方极其实际的残酷代价强烈对撞。
+- **范式**：`《一方看似轻巧的遮羞布，抵得上另一方XX的代价？》`
+- **经典范例**：`《中国人的隐私只值4张重置卡？》`
+
+### 2. 极端假说 / 歪理正说型（打破光环）
+- **逻辑**：在政策与清朗合规的范围内，抛出一个颠覆常识的尖锐论断，正文层层拆解。
+- **范式**：`《别再神化 XX 了，今天算完这笔账我只觉得离谱》` / `《XX 越强大，我们离失业反而更远了？》`
+
+### 3. 看似中立实则拱火型（提供讨论舞台）
+- **逻辑**：不直接站队，但把两边的命门直接挑破，引导评论区站队互撕。
+- **范式**：`《当所有人都在吹 XX 的时候，最慌的其实是这群人》` / `《XX 终于降价了，但国产大模型到底谁在裸泳？》`
+
+### 4. 反直觉草台揭秘型
+- **逻辑**：揭露光鲜技术背后的草台班子真相。
+- **范式**：`《全网狂吹的生产力神器，正在让世界高效产出屎山》`
+
+### 5. 极硬福利 / 避坑实操型
+- **逻辑**：直接给到读者当下的确定性收益或止损。
+- **范式**：`《直接摊开写：外面收费 2000 的 XX 漏洞原理拆解》`
+
+---
+
+## 输出规范：`title-options.md`
 
 ```md
 # 标题研究
 
-## 事实与承诺边界
-- 可写进标题的事实：
-- 不能写进标题的内容：
-- 前 100 字如何兑现：
+## 矛盾舞台定义
+- A 阵营利益：
+- B 阵营痛点：
+- 前 100 字如何兑现标题承诺：
 
-## 候选标题
-1. 标题｜角度：｜点击理由：｜风险：
-2. 标题｜角度：｜点击理由：｜风险：
-3. 标题｜角度：｜点击理由：｜风险：
-4. 标题｜角度：｜点击理由：｜风险：
-5. 标题｜角度：｜点击理由：｜风险：
+## 候选标题矩阵
+1. [挑拨对立] 标题 ｜ 触发情绪： ｜ 潜在争议点：
+2. [极端假说] 标题 ｜ 触发情绪： ｜ 潜在争议点：
+3. [拱火舞台] 标题 ｜ 触发情绪： ｜ 潜在争议点：
+4. [草台揭秘] 标题 ｜ 触发情绪： ｜ 潜在争议点：
+5. [硬核实操] 标题 ｜ 触发情绪： ｜ 潜在争议点：
 
-## 最终标题
+## 最终锁定
 - 标题：
-- 定稿依据：
-- 确认依据：
+- 决策依据：
 ```
 
-Create at least five candidates. Cover at least three useful angles: concrete benefit or cost, a real change, a reader pain point, an evidence-backed surprise, or an actionable path.
+---
 
-After the final title is locked, also write `digest.md`. It is the WeChat article summary, not a body introduction:
+## 摘要钩子：`digest.md`
 
-- 1–2 short sentences, ideally 15–20 Chinese characters total and never more than 25 characters;
-- add a concrete unresolved tension or payoff, so title + cover + digest work as one click decision;
-- do not repeat the title, explain the article structure, promise unverified results, or use empty “本文带你”；
-- it will be passed directly to the WeChat draft API.
-
-Never invent “实测”“官宣”“免费”“最后窗口” or a number. Do not stack the same keyword, use empty “重磅/颠覆/全面解析”, or silently change a user-approved title.
+标题锁定后，立即输出 `digest.md`（直接注入微信草稿箱 API）：
+- 长度严格在 **15–20 个汉字**（硬上限 25 字）；
+- 不做全文长概括，只写一句话悬念或未解决的张力；
+- 严禁空洞的“本文带你了解……”；标题、封面与摘要三位一体促成点击决策。

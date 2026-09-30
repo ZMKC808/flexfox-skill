@@ -19,6 +19,24 @@ IMAGE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
 
 def body_without_title(markdown: str) -> str:
     lines = markdown.splitlines()
+
+    # Step 1: Strip YAML frontmatter if present
+    start_idx = 0
+    for idx, line in enumerate(lines):
+        if line.strip():
+            start_idx = idx
+            break
+
+    if start_idx < len(lines) and lines[start_idx].strip() == "---":
+        end_fm_idx = -1
+        for idx in range(start_idx + 1, len(lines)):
+            if lines[idx].strip() in ("---", "..."):
+                end_fm_idx = idx
+                break
+        if end_fm_idx != -1:
+            lines = lines[end_fm_idx + 1 :]
+
+    # Step 2: Strip the first H1 header
     for index, line in enumerate(lines):
         if not line.strip():
             continue

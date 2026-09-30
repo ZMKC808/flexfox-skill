@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1
+
+- Fix body rendering for YAML frontmatter, adjacent headings, fenced code blocks, local images, and escaped links.
+- Reject inline or data-URI body images instead of silently emitting malformed content.
+- Add renderer regression checks to local validation and GitHub Actions.
+
 ## 0.6.0
 
 - Add unified scraper `scripts/fetch_source.py` supporting both WeChat articles and Twitter/X posts (with automatic image extraction).

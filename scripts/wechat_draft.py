@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import mimetypes
 import re
@@ -217,21 +218,21 @@ def upload_cover(token: str, cover: Path) -> str:
     return media_id
 
 
-def replace_images(token: str, html: str, base_dir: Path | None = None) -> tuple[str, int]:
-    if "data:image/" in html:
+def replace_images(token: str, rendered_html: str, base_dir: Path | None = None) -> tuple[str, int]:
+    if "data:image/" in rendered_html:
         raise WeChatError("Charcoal layout contains raw base64 data URIs. Use local file paths or remote URLs instead.")
     cache: dict[str, str] = {}
     count = 0
 
     def replace(match: re.Match[str]) -> str:
         nonlocal count
-        source = match.group(2)
+        source = html.unescape(match.group(2))
         if source not in cache:
             cache[source] = upload_inline_image(token, source, base_dir=base_dir)
         count += 1
         return match.group(1) + cache[source] + match.group(3)
 
-    return IMG_SRC.sub(replace, html), count
+    return IMG_SRC.sub(replace, rendered_html), count
 
 
 def create_draft(token: str, *, title: str, digest: str, author: str, cover_media_id: str, html: str, show_cover_pic: int) -> str:

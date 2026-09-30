@@ -9,3 +9,4 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 uv run --with pyyaml python3 "$repo_root/scripts/validate.py"
+PYTHONDONTWRITEBYTECODE=1 python3 "$repo_root/scripts/test_renderer.py"

@@ -12,4 +12,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - name: Validate Skills and plugin package
-        run: uv run --with pyyaml python3 scripts/validate.py
+        run: bash scripts/validate.sh

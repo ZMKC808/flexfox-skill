@@ -3,57 +3,67 @@ name: flexfox-ai-check
 description: Use when checking or repairing AI-sounding, templated, overly polished, or untrustworthy prose in a FlexFox WeChat Official Account article.
 ---
 
-# FlexFox AI 检查
+# FlexFox 编辑与 22 项 AI 指纹审查
 
-This is an editorial quality gate, not a disguise exercise. The aim is clearer thinking, real evidence, and the author's own voice.
+本模块是文章发布前的质量与人味硬门槛，不是单纯的词语替换。核心目标是剔除 AI 写作特有的“过度工整、光滑、说教与虚假感”，确保文章有血有肉、事实可信、人设立得住。
 
-Read the Profile, `article.md`, `brief.md`, and `evidence.md`. Write `review.md` in source order. Quote each problem passage, name the problem, and state the smallest safe repair.
+审查时读取：当前 Profile、`article.md`、`brief.md`、`evidence.md`。审查结果按出现顺序输出至 `review.md`。
 
-## Blockers: fix before delivery
+## 一票否决项（阻断交付硬伤）
 
-- fabricated experience, person, dialogue, date, number, quote, test result, or source;
-- a claim that contradicts `evidence.md`;
-- a headline promise not delivered in the opening;
-- collaboration traces such as “按你的要求”“我先写一版”.
+- **虚构事实**：凭空捏造亲身经历、测试结果、报错细节、人物对话、虚假数据或伪造官宣；
+- **脱离证据**：正文中的具体数字、价格、限制与 `evidence.md` 冲突；
+- **开场画饼未兑现**：标题承诺的痛点或收益在正文前 100 字内未开始兑现；
+- **协作痕迹**：出现“正如你所要求的”、“我先写一版”、“你提供的材料”等与大模型的交互对话痕迹。
 
-## AI-pattern check
+## 22 项 AI 塑料味指纹扫描（命中即打回）
 
-Inspect context, rather than mechanically banning a phrase:
+| 编号 | AI 典型指纹 | 表现特征 | 修正方案 |
+| :--- | :--- | :--- | :--- |
+| **#1** | **求生欲式免责声明** | “当然，这并不是说……仍然需要……” | 删掉免责废话，直接说事实和限制 |
+| **#2** | **虚假的「讲个故事」** | 凭空造景（“在清晨的办公室里，程序员小张正对着屏幕叹气……”） | 从真实的行业痛点和工具摩擦切入，不编造小说场景 |
+| **#3** | **匀速对称排比** | 连续三个分句字数完全相同，语法结构像节拍器 | 打碎句式，长短交错，甚至单句成行 |
+| **#4** | **模板化让步翻转** | “真正做XX时，最XX的往往不是A，而是B” | 禁用此句式，直接摆出账本和痛点 |
+| **#5** | **每个段落必有收束金句** | 无论多小的事实，段末非要升华出一句对仗哲学 | 删掉空洞总结，保留真实的未完之意 |
+| **#6** | **替读者说蠢话再纠正** | “大家都会问……其实没那么简单” | 不要预设读者蠢，直接陈述反直觉事实 |
+| **#7** | **「不是 X 是 Y」高密度** | 全文出现 3 次以上“不是……而是……” | 强行删除“不是”，只讲正面是什么 |
+| **#8** | **假拟人口头禅** | “没有什么玄学”、“说白了”、“说实话” | 删掉口头禅，直接讲客观逻辑 |
+| **#9** | **没有任何犹疑与阻力** | 描述操作如同丝滑溜冰，完全没有碰壁与报错 | 仅在有真证据时补充摩擦细节，否则用客观拆解视角 |
+| **#10** | **机械化大综述闭环** | 结尾用大排比把前面几个案例强行串成闭环 | 自然收束，给出主观倾向即可 |
+| **#11** | **把结论包装成协议** | “这是一套底层范式/生产链路” | 用口语人话（如“这套打法”、“这套路子”） |
+| **#12** | **情绪过载而事实亏空** | 狂喊“恐怖如斯”、“太炸了”、“杀死比赛” | 用具体倍数、金额和工时替代感叹词 |
+| **#13** | **公关连接词堆叠** | “值得注意的是”、“总而言之”、“首先其次” | 全部剔除，直接转折或换行 |
+| **#14** | **长段落窒息感** | 手机一屏全是密不透风的文字块 | 强制每段控制在 1~3 句，关键结论单独成段 |
+| **#15** | **无意义的名词包装** | 动辄“飞轮”、“抓手”、“赋能”、“底座” | 换成“怎么做”、“工具”、“方法” |
+| **#16** | **滥用破折号与分割线** | 正文出现 `——` 或大量 `---` 分割线 | 微信排版依赖留白和标题，不依赖破折号 |
+| **#17** | **假全知视角** | “正如业内专家所预言……” | 降维为普通操盘手视角：“我当时看到也懵了” |
+| **#18** | **结尾假大空展望** | 突然拔高到“AI 正在重塑人类未来的黎明” | 狠狠拉回地面：“下个月会员到底续不续” |
+| **#19** | **前后态度骑墙中立** | 既说这个好，又说那个好，各打五十大板 | 个人号要有一贯的偏见，明确选边站 |
+| **#20** | **虚假的提问互动** | “你准备好拥抱变革了吗？” | 换成具体场景：“你今天改稿被卡了多久？” |
+| **#21** | **自相矛盾的格式混搭** | 纯口语文章里突然冒出学术论文式的加粗引用 | 保持全文语体一致 |
+| **#22** | **空洞的行动号召** | “让我们拭目以待吧！” | 换成清晰实操：“链接放在这，自己去点” |
 
-1. repeated “不是 X 而是 Y” reversals;
-2. smooth three-part parallelism or repeated sentence molds;
-3. guide voice: “首先/其次/最后/下面说三点”；
-4. every paragraph ending in a polished slogan;
-5. abstract words explaining another abstract word;
-6. false specificity and invented sensory scenes;
-7. empty connectors, translationese, or stock emotional reactions;
-8. a title-hook-pain-promise opening that sells anxiety before giving information;
-9. overuse of em dashes, quotation marks, bolding, or one-sentence fragments;
-10. hollow philosophical uplift instead of returning to the reader's real situation.
+## 修订原则与报告格式
 
-## Repair protocol
-
-1. Preserve a clean passage; do not invent faults to fill a report.
-2. Send only the flagged passages and their intended meaning to `flexfox-writer`.
-3. Recheck the repaired passages, source claims, and first 100 words.
-4. Mark `pass` only when blockers are resolved. A pass does not certify factual claims that have no source.
-
-Use this structure:
+1. 准确定位问题段落，给出最小修改方案，不整篇推翻重写；
+2. 修复后对整段及上下文重新复检；
+3. 输出格式保存至 `review.md`：
 
 ```md
 # 编辑与 AI 检查
 
 ## 通过项
--
+- 事实硬核度：价格与参数已核对
+- 结构节奏：无长段落文字墙，加粗控制在 3 处
 
 ## 待修订
-### 1. 位置或小节
-> 原文
+### 1. [小节名/段落位置]
+> 原文句子
 
-问题：
-修改方向：
+- 命中指纹：#7「不是 X 是 Y」
+- 修改方案：删除前置否定，直接叙述事实。
 
-## 复检
-- 状态：pass / needs-input
-- 未解决风险：
+## 综合判定
+- 状态：pass / needs-revision
+- 查重与原创性：结构独立，无连续雷同句式
 ```
