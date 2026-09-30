@@ -9,6 +9,18 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 
 审查前必须确认同目录 `structure-check.json` 的状态为 `pass`；否则退回 `flexfox-writer`，不得生成“通过”的 `review.md`。审查时读取：当前 Profile、`article.md`、`brief.md`、`evidence.md`。审查结果按出现顺序输出至 `review.md`。
 
+## 必写事实逐项核验
+
+从 `brief.md` 的「素材关系与关键证据」取出每个 `[必写] E##`。逐条核对它在正文的具体章节/段落、是否保留了证据原意、是否被错误弱化或夸大。必须把核对结果写进 `review.md`：
+
+```md
+## 必写事实落稿核验
+- [通过] E01：在「小标题」第 N 段，正文已说明……；与 evidence.md 一致。
+- [失败] E02：正文缺失；退回补写。
+```
+
+只要有任一必写事实没有对应正文位置，综合判定必须是 `needs-revision`。这一步专门防止“大纲写了、成稿漏了”。
+
 ## 一票否决项（阻断交付硬伤）
 
 - **虚构事实**：凭空捏造亲身经历、测试结果、报错细节、人物对话、虚假数据或伪造官宣；
@@ -56,6 +68,9 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 ## 通过项
 - 结构门禁：引用 `structure-check.json`，状态为 pass
 - 事实硬核度：价格与参数已核对
+
+## 必写事实落稿核验
+- [通过/失败] E编号：正文位置与核验结论
 
 ## 待修订
 ### 1. [小节名/段落位置]

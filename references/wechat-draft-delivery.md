@@ -10,6 +10,8 @@
 
 `FLEXFOX_WECHAT_AUTO_DRAFT=1` 仅适合账号主人明确要求“完成后自动进草稿箱”的账号；默认示例为 `0`。无论开关为何，脚本都要求 `--confirm-draft`，以便调用方在本次任务中明确执行投递。
 
+AI飞升录 Profile 固定使用开场 GIF：先运行 `scripts/sync_intro_gif.py` 写入私密的 `FLEXFOX_WECHAT_INTRO_GIF_URL`，并在生成 `wechat-body.md` 时传入 `--require-intro-gif`。URL 缺失时必须停止，不能用“只剩欢迎语”的首屏替代。
+
 草稿上传使用 Python 的 `requests`；为避免给用户机器永久安装依赖，统一用 `uv run --with requests python3 scripts/wechat_draft.py …` 调用。
 
 ## 投递边界

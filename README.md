@@ -38,9 +38,10 @@ git clone https://github.com/<owner>/flexfox-wechat-writing-system.git
    - 先运行 `python3 scripts/validate_article.py --article articles/2026-09-30-主题/article.md --sources articles/2026-09-30-主题/sources/index.json`；通过后才运行 AI 味与事实审查。
 4. **排版与草稿箱投递**：
    - 生成固定转发词 `转发词.md` 与封面提示词 `images/cover-prompt.md`；
+   - 默认 AI飞升录 Profile 的本机私密配置须先写入开场 GIF URL；缺失时应停止，不得交付少了首屏组件的排版稿；
    - 本地编译排版：
      ```bash
-     python3 scripts/prepare_wechat_body.py --article articles/2026-09-30-主题/article.md --output articles/2026-09-30-主题/wechat-body.md
+     python3 scripts/prepare_wechat_body.py --article articles/2026-09-30-主题/article.md --output articles/2026-09-30-主题/wechat-body.md --require-intro-gif
      ```
    - 一键推送草稿箱（需本地配置 `config/wechat.local.env`）：
      ```bash

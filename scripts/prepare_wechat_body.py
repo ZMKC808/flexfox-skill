@@ -59,6 +59,7 @@ def main() -> None:
     parser.add_argument("--article", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=root / "config/wechat.local.env")
+    parser.add_argument("--require-intro-gif", action="store_true", help="Fail if no valid opening GIF URL is configured")
     args = parser.parse_args()
 
     config = {}
@@ -69,6 +70,12 @@ def main() -> None:
             pass
 
     gif_url = config.get("FLEXFOX_WECHAT_INTRO_GIF_URL", "")
+    require_intro_gif = args.require_intro_gif or config.get("FLEXFOX_WECHAT_REQUIRE_INTRO_GIF") == "1"
+    if require_intro_gif and not gif_url.startswith(("https://", "http://")):
+        raise SystemExit(
+            "Error: this account requires an opening GIF. Set FLEXFOX_WECHAT_INTRO_GIF_URL in local config "
+            "or run scripts/sync_intro_gif.py first."
+        )
     markdown = args.article.read_text(encoding="utf-8")
     body = body_without_title(markdown)
     if not body:

@@ -21,10 +21,11 @@ The WeChat platform owns the title field, so do not duplicate `# 标题` in the 
 ```bash
 python3 scripts/prepare_wechat_body.py \
   --article articles/YYYY-MM-DD-明确主题/article.md \
-  --output articles/YYYY-MM-DD-明确主题/wechat-body.md
+  --output articles/YYYY-MM-DD-明确主题/wechat-body.md \
+  --require-intro-gif
 ```
 
-The active local account config must already contain the opening GIF URL if configured. It is created once with `uv run --with requests python3 scripts/sync_intro_gif.py` and remains private to that account.
+The default AI飞升录 Profile requires this fixed GIF. Its active local account config must contain the opening GIF URL; otherwise preparation stops instead of silently producing a different first screen. Create it once with `uv run --with requests python3 scripts/sync_intro_gif.py`; the source GIF and generated URL remain private to that account. A different Profile without a fixed opener omits `--require-intro-gif`.
 
 For the body that follows the opening:
 

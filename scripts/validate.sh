@@ -11,3 +11,4 @@ fi
 uv run --with pyyaml python3 "$repo_root/scripts/validate.py"
 PYTHONDONTWRITEBYTECODE=1 python3 "$repo_root/scripts/test_renderer.py"
 PYTHONDONTWRITEBYTECODE=1 python3 "$repo_root/scripts/test_article_validator.py"
+PYTHONDONTWRITEBYTECODE=1 python3 "$repo_root/scripts/test_prepare_wechat_body.py"
