@@ -13,6 +13,7 @@ FlexFox 是一套可安装、可插拔的公众号写作系统：从微信/推�
 - **Flowcast 离线炭黑排版**：本地固化炭黑商务主题样式（`render_charcoal.py`），生成标准微信兼容内联 HTML，未来支持扩展更多颜色主题。
 - **提示词接力生图**：标准化生成 900×383 纯黑白手绘线稿视觉隐喻封面提示词（`images/cover-prompt.md`），可一键交由 GPT、Midjourney、Ideogram 或 Codex 接力生图。
 - **单套固定转发词**：严格沿用 5 段式槽位替换，保持极简素人感。
+- **Gemini 无人交接**：Gemini 在同一项目内写完文章后落 `handoff.json`，Codex 自动接手质检、GPT 封面、转发词、炭黑排版，并在本机账号明确开启自动草稿时创建一篇草稿；永不发布或群发。
 
 ## 安装与快速使用
 
@@ -79,3 +80,14 @@ articles/YYYY-MM-DD-主题/
 ## Profile 插拔与定制
 
 默认读取 `profiles/ai-feishenglu.md`。其他账号只需在项目根目录下放置 `flexfox-profile.md`（可参考 `assets/profile-template.md`），即可自定义立场卡、口癖指纹库、结尾 CTA 与专属视觉风格。
+
+## Gemini 自动交接
+
+Gemini 可直接在本机写作时，读取项目根目录的 [GEMINI.md](GEMINI.md)。它完成一篇完整文章包后在文章目录落 `handoff.json`；Codex 先运行：
+
+```bash
+python3 scripts/validate_handoff.py \
+  --handoff articles/YYYY-MM-DD-主题/handoff.json
+```
+
+交接协议和自动化边界见 [Gemini 交接合同](references/gemini-handoff.md)。若 `handoff.json` 设置 `draft_delivery: true`，并且私密配置同步设置 `FLEXFOX_WECHAT_AUTO_DRAFT=1`，Codex 会在本地排版成功后创建一篇草稿；绝不发布或群发。
