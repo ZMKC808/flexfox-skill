@@ -29,4 +29,4 @@ Define:
 - **核心证据链**：支撑主线的核心事实与证据配图。对链接二创，将每一条必须进入正文的事实标为 `[必写] E##`；
 - **读者带走的结论**：读者读完后能带走的具体动作、判断或避坑建议。
 
-For a new article, pause for the user's direction before full drafting unless they have already supplied or confirmed this Brief.
+For manual work, pause for the user's direction before full drafting unless they have already supplied or confirmed this Brief. A valid Gemini `handoff.json` is the corresponding automatic confirmation.

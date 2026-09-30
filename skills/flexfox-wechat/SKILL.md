@@ -31,6 +31,8 @@ Use the system as a production chain, not a file checklist. The goal is a credib
 
 For a new article, create or complete `brief.md` before drafting. It must contain: one-line main thread, material relationship and key evidence, reader takeaway, image plan, and confirmation basis. “Material relationship” is free-form editorial judgment, not a fixed event template: it identifies what opens the article, what is essential context, what evidence carries each turn, and what stays background. If the user already confirmed a direction, reuse that confirmation without asking again.
 
+For a valid Gemini `handoff.json`, that marker is the confirmation for this article: do not ask the user again to approve the Brief, title, cover or draft. Repair failed structure and prose checks within verified evidence, then continue. Stop only when a repair would require invented facts, unavailable assets, a new external authorization, or a failed WeChat API request.
+
 ## Full-task completion
 
 - Keep `article.md` as the only prose source. Downstream Skills may create assets and reports but must not overwrite it without an explicit revision step.
