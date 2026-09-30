@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+.vscode/
+articles/
+flexfox-profile.md
+*.local.md
+config/*.local.env
+__pycache__/
