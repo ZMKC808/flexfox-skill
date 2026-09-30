@@ -7,12 +7,13 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 
 本模块是文章发布前的质量与人味硬门槛，不是单纯的词语替换。核心目标是剔除 AI 写作特有的“过度工整、光滑、说教与虚假感”，确保文章有血有肉、事实可信、人设立得住。
 
-审查时读取：当前 Profile、`article.md`、`brief.md`、`evidence.md`。审查结果按出现顺序输出至 `review.md`。
+审查前必须确认同目录 `structure-check.json` 的状态为 `pass`；否则退回 `flexfox-writer`，不得生成“通过”的 `review.md`。审查时读取：当前 Profile、`article.md`、`brief.md`、`evidence.md`。审查结果按出现顺序输出至 `review.md`。
 
 ## 一票否决项（阻断交付硬伤）
 
 - **虚构事实**：凭空捏造亲身经历、测试结果、报错细节、人物对话、虚假数据或伪造官宣；
 - **脱离证据**：正文中的具体数字、价格、限制与 `evidence.md` 冲突；
+- **证据外加戏**：来源未写明的日期、人数、收购、亲历、报错或人物对话被写成确定事实；
 - **开场画饼未兑现**：标题承诺的痛点或收益在正文前 100 字内未开始兑现；
 - **协作痕迹**：出现“正如你所要求的”、“我先写一版”、“你提供的材料”等与大模型的交互对话痕迹。
 
@@ -45,7 +46,7 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 
 ## 修订原则与报告格式
 
-1. 准确定位问题段落，给出最小修改方案，不整篇推翻重写；
+1. 不重复结构门禁已经检查过的字数、标题数和段落数；准确定位事实或文风问题，给出最小修改方案，不整篇推翻重写；
 2. 修复后对整段及上下文重新复检；
 3. 输出格式保存至 `review.md`：
 
@@ -53,8 +54,8 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 # 编辑与 AI 检查
 
 ## 通过项
+- 结构门禁：引用 `structure-check.json`，状态为 pass
 - 事实硬核度：价格与参数已核对
-- 结构节奏：无长段落文字墙，加粗控制在 3 处
 
 ## 待修订
 ### 1. [小节名/段落位置]

@@ -7,8 +7,8 @@ FlexFox 是一套可安装、可插拔的公众号写作系统：从微信/推�
 ## 核心特性
 
 - **半自动化与人机协同**：在关键节点（Brief 论点卡、标题确定、推草稿箱）设有明确的人工确认门禁，AI 绝不自作主张。
-- **内置全能抓取**：自带 `scripts/fetch_source.py`，支持抓取微信公众号（含配图）与 Twitter/X 长推（含高清大图与媒体），自动完成原图清洗与事实提纯。
-- **超低重复率二创（< 30%）**：通过“裸事实提取（物理隔离）+ 账号立场乘法 + FlexFox 时间推进轴重构”，彻底杜绝洗稿与同义词机械替换。
+- **内置全能抓取**：自带 `scripts/fetch_source.py`，支持抓取微信公众号（含配图）与 Twitter/X 长推（含高清大图与媒体），为每个输入链接生成带状态的来源账本。
+- **可执行的长文门禁**：二创先做来源提纯、素材关系与大纲，再由脚本校验 2,200–3,000 字、3–5 个小标题、每节段落预算、加粗纪律、必写事实、多源覆盖与图片数量/去重/间隔；未通过不能排版或推送。
 - **本地图片直推微信 CDN**：写稿全程支持本地相对路径配图（如 `images/01.png`），在调用微信草稿箱接口时，脚本自动将本地图片上传至微信官方 CDN 并完成内联替换，无需配置或依赖外部图床。
 - **Flowcast 离线炭黑排版**：本地固化炭黑商务主题样式（`render_charcoal.py`），生成标准微信兼容内联 HTML，未来支持扩展更多颜色主题。
 - **提示词接力生图**：标准化生成 900×383 纯黑白手绘线稿视觉隐喻封面提示词（`images/cover-prompt.md`），可一键交由 GPT、Midjourney、Ideogram 或 Codex 接力生图。
@@ -26,14 +26,16 @@ git clone https://github.com/<owner>/flexfox-wechat-writing-system.git
 
 1. **抓取素材（微信/推特/X）**：
    ```bash
-   python3 scripts/fetch_source.py "https://mp.weixin.qq.com/s/..." -o articles/2026-09-30-主题/过程/来源
+   python3 scripts/fetch_source.py "https://mp.weixin.qq.com/s/..." -o articles/2026-09-30-主题/sources
    ```
 2. **清洗与二创**：
-   - AI 清洗垃圾图，保留控制台/代码/报错/账单等证据图至 `images/`，产出 `evidence.md`；
-   - 结合 Profile 生成 100 字 Brief 与 5 个候选标题，等待人工确认。
+   - 检查 `sources/index.json`：每个链接都有 `S01` 编号和成功/失败状态；
+   - AI 清洗垃圾图，保留控制台/代码/报错/账单等证据图至 `images/`；以 `[E01][S01]` 标记提纯事实写入 `evidence.md`；
+   - 在 `brief.md` 用自由的「素材关系与关键证据」明确本篇必写事实（`[必写] E##`）和图片计划，再让 `outline.md` 分配事实与图片角色；这不是固定事件模板，教程、实测、争议和趋势稿各自组织材料；
+   - 深度长文默认 6–8 张正文图、教程/实测 7–10 张；图不能重复或相邻堆放，且要在 `images/manifest.md` 登记来源、用途、文件哈希；结合 Profile 生成 Brief 与候选标题，等待人工确认。
 3. **正文撰写与质检**：
-   - 确认主线后，AI 采用灵动狐短句瀑布、野比喻、真摩擦细节撰写 `article.md`；
-   - 运行 22 项 AI 味指纹审查与去洗稿检查，完成局部微调。
+   - 确认主线后，AI 依据大纲采用灵动狐短句瀑布、野比喻、真摩擦细节撰写 `article.md`；
+   - 先运行 `python3 scripts/validate_article.py --article articles/2026-09-30-主题/article.md --sources articles/2026-09-30-主题/sources/index.json`；通过后才运行 AI 味与事实审查。
 4. **排版与草稿箱投递**：
    - 生成固定转发词 `转发词.md` 与封面提示词 `images/cover-prompt.md`；
    - 本地编译排版：
@@ -55,11 +57,14 @@ git clone https://github.com/<owner>/flexfox-wechat-writing-system.git
 ```text
 articles/YYYY-MM-DD-主题/
 ├── brief.md                      # 读者画像、一句话主线、不聊什么
+├── sources/index.json             # 输入链接与抓取状态账本（二创）
 ├── evidence.md                   # 裸事实清单与核心数据
+├── outline.md                     # 章节、证据、段落预算（内部过程）
 ├── title-options.md              # 标题研究矩阵与最终标题
 ├── digest.md                     # 15–20字公众号钩子摘要
 ├── article.md                    # 唯一正文母本 (内嵌本地相对图片)
 ├── review.md                     # AI味与去洗稿检查记录
+├── structure-check.json           # 字数、标题、段落、多源覆盖门禁
 ├── 转发词.md                     # 单套固定槽位替换转发文案
 ├── wechat-body.md                # 包含开场组件的排版输入稿
 ├── wechat-draft.json             # 微信草稿箱推送回执

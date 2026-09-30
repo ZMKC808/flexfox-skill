@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Unified source and image scraper for WeChat Official Accounts and Twitter/X.
 
+Supports scraping multiple URLs in a single run.
 Downloads article/tweet text into Markdown and saves all associated images locally.
 Zero external dependencies (uses standard library urllib, json, re, html).
 """
@@ -61,7 +62,8 @@ def fetch_wechat(url: str, out_dir: Path) -> Path:
         with urllib.request.urlopen(req, timeout=25) as resp:
             raw_content = resp.read().decode("utf-8", errors="replace")
     except Exception as e:
-        sys.exit(f"Error fetching WeChat URL: {e}")
+        log(f"Error fetching WeChat URL ({url}): {e}")
+        return out_dir / "error.txt"
 
     out_dir.mkdir(parents=True, exist_ok=True)
     images_dir = out_dir / "images"
@@ -153,10 +155,10 @@ def fetch_wechat(url: str, out_dir: Path) -> Path:
 
 def fetch_twitter_x(url: str, out_dir: Path) -> Path:
     log(f"Fetching Twitter/X post: {url}")
-    # Normalize URL: extract screen_name and status_id
     m = re.search(r'(?:twitter\.com|x\.com)/([a-zA-Z0-9_]+)/status/(\d+)', url)
     if not m:
-        sys.exit("Invalid Twitter/X status URL. Format: https://x.com/<user>/status/<id>")
+        log(f"Invalid Twitter/X status URL: {url}")
+        return out_dir / "error.txt"
     screen_name, status_id = m.group(1), m.group(2)
 
     api_url = f"https://api.fxtwitter.com/{screen_name}/status/{status_id}"
@@ -165,11 +167,13 @@ def fetch_twitter_x(url: str, out_dir: Path) -> Path:
         with urllib.request.urlopen(req, timeout=25) as resp:
             data = json.loads(resp.read().decode("utf-8"))
     except Exception as e:
-        sys.exit(f"Failed to query Twitter API mirror ({api_url}): {e}")
+        log(f"Failed to query Twitter API mirror ({api_url}): {e}")
+        return out_dir / "error.txt"
 
     tweet = data.get("tweet", {})
     if not tweet:
-        sys.exit("Empty tweet data returned by API mirror.")
+        log(f"Empty tweet data returned by API mirror for {url}")
+        return out_dir / "error.txt"
 
     author = tweet.get("author", {})
     author_name = author.get("name", screen_name)
@@ -228,21 +232,77 @@ def fetch_twitter_x(url: str, out_dir: Path) -> Path:
     return target_file
 
 
+def process_single_url(url: str, target_dir: Path) -> Path:
+    if "mp.weixin.qq.com" in url:
+        return fetch_wechat(url, target_dir)
+    elif "x.com" in url or "twitter.com" in url:
+        return fetch_twitter_x(url, target_dir)
+    else:
+        log(f"Unsupported URL: {url}")
+        return target_dir / "error.txt"
+
+
+def source_record(source_id: str, url: str, base_dir: Path, result: Path) -> dict[str, object]:
+    """Create a durable source-ledger record for every input URL."""
+    record: dict[str, object] = {
+        "id": source_id,
+        "url": url,
+        "status": "failed",
+        "path": str(result.relative_to(base_dir)) if result.is_relative_to(base_dir) else str(result),
+        "title": None,
+        "image_count": 0,
+    }
+    if not (result.is_file() and result.name == "source.md"):
+        return record
+
+    lines = result.read_text(encoding="utf-8", errors="replace").splitlines()
+    record["status"] = "success"
+    record["title"] = lines[0].removeprefix("# ") if lines else "未命名来源"
+    manifest = result.parent / "image-manifest.json"
+    if manifest.is_file():
+        try:
+            images = json.loads(manifest.read_text(encoding="utf-8"))
+            record["image_count"] = len(images) if isinstance(images, list) else 0
+        except json.JSONDecodeError:
+            pass
+    return record
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch WeChat articles or Twitter/X tweets with images.")
-    parser.add_argument("url", help="Target URL (mp.weixin.qq.com or x.com/twitter.com)")
-    parser.add_argument("-o", "--output", default="source", help="Output directory to save source.md and images/")
+    parser = argparse.ArgumentParser(description="Fetch one or more WeChat articles or Twitter/X tweets with images.")
+    parser.add_argument("urls", nargs="+", help="One or more target URLs (mp.weixin.qq.com or x.com/twitter.com)")
+    parser.add_argument("-o", "--output", default="source", help="Output base directory to save source files and images/")
     args = parser.parse_args()
 
-    target_dir = Path(args.output).resolve()
-    url = args.url.strip()
+    base_dir = Path(args.output).resolve()
+    urls = [u.strip() for u in args.urls if u.strip()]
 
-    if "mp.weixin.qq.com" in url:
-        fetch_wechat(url, target_dir)
-    elif "x.com" in url or "twitter.com" in url:
-        fetch_twitter_x(url, target_dir)
-    else:
-        sys.exit("Unsupported URL. Please provide a WeChat (mp.weixin.qq.com) or Twitter/X (x.com) link.")
+    base_dir.mkdir(parents=True, exist_ok=True)
+    log(f"Processing {len(urls)} URL(s) into {base_dir}...")
+    records: list[dict[str, object]] = []
+    for idx, url in enumerate(urls, 1):
+        source_id = f"S{idx:02d}"
+        sub_dir = base_dir / f"source_{idx:02d}"
+        result = process_single_url(url, sub_dir)
+        records.append(source_record(source_id, url, base_dir, result))
+
+    index = {"schema_version": 1, "sources": records}
+    (base_dir / "index.json").write_text(
+        json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    summary_lines = [f"# 来源账本（共 {len(records)} 个输入）\n"]
+    for record in records:
+        summary_lines.extend(
+            [
+                f"## [{record['id']}] {record['title'] or '抓取失败'}",
+                f"- 状态：{record['status']}",
+                f"- 链接：{record['url']}",
+                f"- 路径：`{record['path']}`",
+                f"- 图片：{record['image_count']} 张\n",
+            ]
+        )
+    (base_dir / "index.md").write_text("\n".join(summary_lines), encoding="utf-8")
+    log(f"Source ledger written to {base_dir / 'index.json'}")
 
 
 if __name__ == "__main__":
