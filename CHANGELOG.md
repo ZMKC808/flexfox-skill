@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+- Remove Gemini/Codex handoff, polling, and external-AI cover relay from the package.
+- Make the final 900×383 cover a native FlexFox image-generation deliverable, not a prompt for another tool.
+
 ## 0.6.1
 
 - Fix body rendering for YAML frontmatter, adjacent headings, fenced code blocks, local images, and escaped links.

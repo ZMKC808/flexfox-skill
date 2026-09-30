@@ -17,12 +17,9 @@
 | `wechat-body.md` | 排版/推草稿时必需 | 包含开场组件的公众号正文输入稿 |
 | `layout-checklist.md` | 排版时必需 | 炭黑商务样式与草稿预览验收记录 |
 | `wechat-draft.json` | 微信草稿箱推送后生成 | 包含草稿 `media_id`、核验状态与交付时间的回执文件 |
-| `images/cover-900x383.png` | 有生图能力时生成 | 900×383 黑底白线视觉隐喻封面大图 |
-| `images/cover-prompt.md` | 必须 | 标准化封面提示词，供 GPT、Midjourney、Ideogram 等工具接力生图 |
+| `images/cover-900x383.png` | 完整写稿必需 | 用原生生图能力生成、检查并裁切为 900×383 的黑底白线视觉隐喻封面大图 |
 | `images/manifest.md` | 有正文图时必需 | 清洗后的证据图清单（序号、来源、用途、文件哈希）；正文图不可重复 |
 | `adaptation.md` | 二创任务必需 | 原文来源、立论乘法、全新角度、重构时间链 |
-| `handoff.json` | Gemini → Codex 自动接力时必需 | Gemini 写稿完成信号；可在 `draft_delivery: true` 与本机自动草稿开关同时开启时，于排版后创建一篇草稿，永不发布或群发 |
-| `codex-handoff-receipt.json` | 自动接力完成后生成 | Codex 已完成步骤、时间和失败原因（如有）；不含正文、密钥或微信回执 |
 
 ## 图片与交付规则说明
 

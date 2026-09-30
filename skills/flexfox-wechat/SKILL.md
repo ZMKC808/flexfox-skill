@@ -27,11 +27,8 @@ Use the system as a production chain, not a file checklist. The goal is a credib
 | “做封面” | `flexfox-cover` |
 | “排版”“炭黑商务” | `flexfox-charcoal-layout` |
 | “推草稿箱”“上传公众号草稿” | `flexfox-wechat-draft` |
-| Gemini 写完并创建 `handoff.json` | Read `../../references/gemini-handoff.md` → validate handoff → perform only its requested post-production steps |
 
 For a new article, create or complete `brief.md` before drafting. It must contain: one-line main thread, material relationship and key evidence, reader takeaway, image plan, and confirmation basis. “Material relationship” is free-form editorial judgment, not a fixed event template: it identifies what opens the article, what is essential context, what evidence carries each turn, and what stays background. If the user already confirmed a direction, reuse that confirmation without asking again.
-
-For a valid Gemini `handoff.json`, that marker is the confirmation for this article: do not ask the user again to approve the Brief, title, cover or draft. Repair failed structure and prose checks within verified evidence, then continue. Stop only when a repair would require invented facts, unavailable assets, a new external authorization, or a failed WeChat API request.
 
 ## Full-task completion
 
@@ -40,9 +37,8 @@ For a valid Gemini `handoff.json`, that marker is the confirmation for this arti
 - After every full draft, run `scripts/validate_article.py`. A `needs-revision` result blocks AI review, layout, and draft delivery. Do not describe a failed draft as reviewed or publish-ready.
 - `flexfox-ai-check` judges facts, voice and misleading phrasing only after the structure gate passes. It must trace every `[必写] E##` to its actual paragraph in `article.md`; a fact present only in evidence or outline is a failed draft. Send only affected passages back to `flexfox-writer` for repair, then recheck those passages.
 - Generate `digest.md` after the title is locked; it is the one- or two-sentence hook used by the WeChat draft, never a long abstract.
-- Generate the cover prompt or cover only after the title is locked. Generate `转发词.md` only after article and title are final, using the active Profile's fixed transfer template. Do not invent alternate “群聊/朋友圈/私发” versions unless the user asks.
+- Generate the final cover with `flexfox-cover` only after the title is locked. It must save `images/cover-900x383.png` using native image generation; prompt-only or external-AI relay is not a complete cover. Generate `转发词.md` only after article and title are final, using the active Profile's fixed transfer template. Do not invent alternate “群聊/朋友圈/私发” versions unless the user asks.
 - Run `flexfox-charcoal-layout` only after article and title are final. It prepares `wechat-body.md` then locally renders the fixed charcoal inline HTML; skip it for a draft-only request.
 - After local layout succeeds, run `flexfox-wechat-draft` only for an explicit draft request, or when both the active Profile and ignored local account config explicitly enable automatic draft delivery. It may create one new draft but must never publish or mass-send.
 - Do not save rendered HTML or use raw base64 data URIs in the body. Local relative image paths (e.g. `images/01.png`) are standard and will be automatically uploaded to WeChat CDN during draft creation.
-- Validate every Gemini handoff with `scripts/validate_handoff.py`. Its automatic endpoint is `codex-handoff-receipt.json` after requested checks, cover work, share copy and local layout. If the handoff sets `draft_delivery: true`, create exactly one draft only after layout succeeds **and** the ignored local account config sets `FLEXFOX_WECHAT_AUTO_DRAFT=1`; validate credentials first. Never publish, mass-send, delete, or retry-create a draft.
 - Report the final title and exact paths of all delivered assets, plus any skipped deliverable and why.
