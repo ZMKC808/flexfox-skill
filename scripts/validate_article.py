@@ -20,6 +20,12 @@ DISPLAY_CHARACTER = re.compile(r"[\u4e00-\u9fffA-Za-z0-9]")
 SOURCE_TAG = re.compile(r"\[(S\d{2,})\]")
 FACT_TAG = re.compile(r"\[(E\d{2,})\]")
 REQUIRED_FACT = re.compile(r"^\s*[-*]\s*\[必写\]\s*(E\d{2,})\b", re.MULTILINE)
+STYLE_RED_FLAGS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("否定式翻转", re.compile(r"不是[^\n。！？]{0,30}而是")),
+    ("公关连接词", re.compile(r"值得注意的是|总而言之|首先|其次")),
+    ("假拟人口头禅", re.compile(r"说白了|说实话")),
+    ("长破折号", re.compile(r"——")),
+)
 
 
 def article_body(markdown: str) -> str:
@@ -28,11 +34,22 @@ def article_body(markdown: str) -> str:
 
 
 def count_paragraphs(section: str) -> int:
+    """Count blank-line-separated semantic blocks, never physical lines."""
     cleaned_lines = [line for line in section.splitlines() if not IMAGE.fullmatch(line.strip())]
     cleaned = "\n".join(cleaned_lines).strip()
     if not cleaned:
         return 0
     return len([part for part in re.split(r"\n\s*\n", cleaned) if part.strip()])
+
+
+def style_red_flags(body: str) -> list[dict[str, object]]:
+    """Return deterministic review prompts; these never decide the structural gate."""
+    flags: list[dict[str, object]] = []
+    for name, pattern in STYLE_RED_FLAGS:
+        matches = pattern.findall(body)
+        if matches:
+            flags.append({"name": name, "count": len(matches)})
+    return flags
 
 
 def load_successful_source_ids(path: Path) -> tuple[list[str], list[str]]:
@@ -98,6 +115,13 @@ def write_reports(directory: Path, report: dict[str, object]) -> None:
     for check in checks:
         marker = "通过" if check["passed"] else "失败"
         lines.append(f"- [{marker}] {check['name']}：{check['detail']}")
+    flags = report["metrics"].get("风格红旗", [])
+    lines.extend(["", "## 风格红旗（供独立审稿复核，不影响结构门禁）"])
+    if flags:
+        for flag in flags:
+            lines.append(f"- {flag['name']}：{flag['count']} 处")
+    else:
+        lines.append("- 无明确禁句命中；仍须进行人工 AI 指纹审稿。")
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -132,6 +156,7 @@ def main() -> None:
     paragraph_counts = [count_paragraphs(section) for section in sections]
     han_count = len(re.findall(r"[\u4e00-\u9fff]", "\n".join(line for line in body.splitlines() if not IMAGE.fullmatch(line.strip()))))
     bold_count = len(re.findall(r"\*\*[^*]+\*\*", body))
+    red_flags = style_red_flags(body)
     image_sources, duplicate_images, image_file_errors, spacing_failures = inspect_images(body, root)
     image_manifest = root / "images" / "manifest.md"
     manifest_text = image_manifest.read_text(encoding="utf-8") if image_manifest.is_file() else ""
@@ -157,9 +182,9 @@ def main() -> None:
             "detail": f"{dict(zip(headings, heading_widths))}；要求每个 4–6 个显示字符",
         },
         {
-            "name": "小节段落数",
+            "name": "小节语义块数",
             "passed": len(paragraph_counts) == len(headings) and all(3 <= count <= 5 for count in paragraph_counts),
-            "detail": f"{paragraph_counts}；要求每节 3–5 段，图片不计入",
+            "detail": f"{paragraph_counts}；要求每节 3–5 个空行分隔的语义块，图片不计入",
         },
         {
             "name": "加粗数量",
@@ -251,12 +276,13 @@ def main() -> None:
             "有效汉字": han_count,
             "二级小标题": len(headings),
             "小标题显示字符数": heading_widths,
-            "各节正文段落数": paragraph_counts,
+            "各节正文语义块数": paragraph_counts,
             "加粗片段": bold_count,
             "正文图片": len(image_sources),
             "图片路径": image_sources,
             "未登记图片": missing_manifest_entries,
             "必写事实": required_facts if args.sources else [],
+            "风格红旗": red_flags,
         },
         "checks": checks,
     }

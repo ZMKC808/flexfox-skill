@@ -50,6 +50,8 @@ flexfox-profile-private/
 
 每次写作只取同类型的 2–3 篇参考，避免模型整库模仿或照抄。完整字段见 [Profile 模板](assets/profile-template.md)。
 
+从旧工作区升级时，不要把整套旧 SOP、历史过程文件和抓取素材塞进新仓库。按[旧 SOP 迁移说明](references/legacy-migration.md)只迁移账号配置、规则摘要和少量黄金样本。
+
 ### 只有要推微信草稿箱时才配置
 
 复制 `assets/wechat-account.example.env` 为 `config/wechat.local.env`，填写：

@@ -9,11 +9,12 @@ Read `../../references/evidence-policy.md`. For linked-source work, also read `.
 
 ## Produce `过程/evidence.md`
 
-For the article project, write three sections:
+For the article project, write the following sections:
 
 1. **已核验事实** — each concrete claim, source URL or supplied material, and what it supports. Linked-source work uses stable `[E01][S01]` tags.
-2. **作者判断** — deductions that are useful but not established as fact.
-3. **不写入正文** — unverified claims, unsupported numbers, rumors, or missing user experience.
+2. **可写摩擦（如有）** — only narrative-useful, verifiable actions, UI states, errors, waits, bills, limits, or user feedback. Mark each item as `本人/本系统实测`、`来源作者实测`、`官方/页面观察` or `用户反馈`, and retain its source tag. No relevant real friction is a valid result; do not invent one or pad this section.
+3. **作者判断** — deductions that are useful but not established as fact.
+4. **不写入正文** — unverified claims, unsupported numbers, rumors, or missing user experience.
 
 Use primary sources for prices, versions, policies, papers, company claims, and product functionality. If a source cannot be read, say what is missing; do not fill the gap with invented precision.
 

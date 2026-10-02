@@ -53,12 +53,20 @@ def main() -> None:
                 f"## {heading}\n\n{paragraphs[0]}\n\n![图](images/{index * 2 - 1}.png)\n\n{paragraphs[1]}\n\n![图](images/{index * 2}.png)\n\n{paragraphs[2]}"
                 for index, heading in enumerate(("现场出问题", "账单有变化", "用户得算账"), 1)
             )
-            + "\n\n**重点** **证据**\n",
+            + "\n**重点** **证据**\n",
             encoding="utf-8",
         )
         passed = run(article, sources)
         assert passed.returncode == 0, passed.stderr
-        assert json.loads((root / "structure-check.json").read_text(encoding="utf-8"))["status"] == "pass"
+        report = json.loads((root / "structure-check.json").read_text(encoding="utf-8"))
+        assert report["status"] == "pass"
+        assert report["metrics"]["各节正文语义块数"] == [3, 3, 3]
+
+        article.write_text(article.read_text(encoding="utf-8") + "\n这不是测试，而是扫描样本。\n", encoding="utf-8")
+        flagged = run(article, sources)
+        assert flagged.returncode == 0, flagged.stderr
+        flags = json.loads((root / "structure-check.json").read_text(encoding="utf-8"))["metrics"]["风格红旗"]
+        assert {item["name"] for item in flags} == {"否定式翻转"}
 
         article.write_text("# 太短\n\n只有一点内容。\n", encoding="utf-8")
         failed = run(article, sources)
