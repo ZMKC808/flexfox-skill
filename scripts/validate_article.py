@@ -101,13 +101,19 @@ def write_reports(directory: Path, report: dict[str, object]) -> None:
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def process_dir(article_dir: Path) -> Path:
+    """Use the compact article layout, while accepting pre-0.9 projects."""
+    candidate = article_dir / "过程"
+    return candidate if candidate.is_dir() else article_dir
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--article", type=Path, required=True, help="Path to article.md")
     parser.add_argument("--sources", type=Path, help="Path to sources/index.json for a multi-source article")
-    parser.add_argument("--evidence", type=Path, help="Defaults to evidence.md beside article.md")
-    parser.add_argument("--outline", type=Path, help="Defaults to outline.md beside article.md")
-    parser.add_argument("--brief", type=Path, help="Defaults to brief.md beside article.md")
+    parser.add_argument("--evidence", type=Path, help="Defaults to 过程/evidence.md when 过程 exists")
+    parser.add_argument("--outline", type=Path, help="Defaults to 过程/outline.md when 过程 exists")
+    parser.add_argument("--brief", type=Path, help="Defaults to 过程/brief.md when 过程 exists")
     parser.add_argument("--min-han", type=int, default=2200)
     parser.add_argument("--max-han", type=int, default=3000)
     parser.add_argument("--min-images", type=int, default=6)
@@ -118,6 +124,7 @@ def main() -> None:
     if not article.is_file():
         raise SystemExit(f"Article not found: {article}")
     root = article.parent
+    process = process_dir(root)
     body = article_body(article.read_text(encoding="utf-8"))
     headings = H2.findall(body)
     sections = re.split(r"^##\s+.+?\s*$", body, flags=re.MULTILINE)[1:]
@@ -188,9 +195,9 @@ def main() -> None:
     ]
 
     if args.sources:
-        evidence = (args.evidence or root / "evidence.md").resolve()
-        outline = (args.outline or root / "outline.md").resolve()
-        brief = (args.brief or root / "brief.md").resolve()
+        evidence = (args.evidence or process / "evidence.md").resolve()
+        outline = (args.outline or process / "outline.md").resolve()
+        brief = (args.brief or process / "brief.md").resolve()
         source_ids, source_errors = load_successful_source_ids(args.sources.resolve())
         evidence_tags = SOURCE_TAG.findall(evidence.read_text(encoding="utf-8")) if evidence.is_file() else []
         outline_tags = SOURCE_TAG.findall(outline.read_text(encoding="utf-8")) if outline.is_file() else []
@@ -253,8 +260,8 @@ def main() -> None:
         },
         "checks": checks,
     }
-    write_reports(root, report)
-    print(f"Article structure check: {report['status']} -> {root / 'structure-check.md'}")
+    write_reports(process, report)
+    print(f"Article structure check: {report['status']} -> {process / 'structure-check.md'}")
     if report["status"] != "pass":
         raise SystemExit(1)
 

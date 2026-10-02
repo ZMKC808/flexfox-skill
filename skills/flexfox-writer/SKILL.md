@@ -5,7 +5,7 @@ description: Draft or revise a FlexFox WeChat long-form article after its brief,
 
 # 灵动狐正文写作
 
-先读当前 Profile、`brief.md`、`evidence.md` 与 `outline.md`，再读[长文结构合同](../../references/article-contract.md)。正文只写入 `article.md`；不得把大纲、来源编号或质检过程混入成稿。
+先读当前 Profile、`过程/brief.md`、`过程/evidence.md` 与 `过程/outline.md`，再读[长文结构合同](../../references/article-contract.md)。正文只写入 `article.md`；不得把大纲、来源编号或质检过程混入成稿。
 
 你是在把一件让读者不淡定、又确实有用的事讲给人听。读者随时会划走，信息必须比解释先到。
 
@@ -40,7 +40,7 @@ description: Draft or revise a FlexFox WeChat long-form article after its brief,
 
 ### 事实与人味红线
 
-- 具体数字、版本、价格、功能、时间和亲历只使用 `evidence.md` 已核验内容；缺证据就删或在过程文件标待核验。
+- 具体数字、版本、价格、功能、时间和亲历只使用 `过程/evidence.md` 已核验内容；缺证据就删或在过程文件标待核验。
 - 不写“愣了一下、后背发凉、回过味来、心里一紧、好家伙、我陷入沉思”等书面反应库存。
 - 不写“首先/其次/总而言之/值得注意的是/说白了/说实话”，不写“不是 X 而是 Y”，不靠长破折号解释。
 - 不替读者说蠢话再纠正，不编人物、场景或自己试过的过程；有真实摩擦才写摩擦。
@@ -48,10 +48,10 @@ description: Draft or revise a FlexFox WeChat long-form article after its brief,
 ### 结构、标题与图片
 
 - 开场三句内交代事件、利益、数字或反常，标题承诺在前 100 字开始兑现。
-- 严格按 `outline.md` 的章节、关键事实、段落预算和图片角色写；每个 `[必写] E##` 必须在对应章节被完整说清。
+- 严格按 `过程/outline.md` 的章节、关键事实、段落预算和图片角色写；每个 `[必写] E##` 必须在对应章节被完整说清。
 - 小标题是走神后的路标：信息型、4–6 个显示字符、能说清下文事实；不为了文学感写抽象悬念。
 - 全文加粗仅 2–4 处，给最核心的反转、数字或判断。
-- 配图按 `brief.md` 图片计划和大纲角色执行。默认深度长文 6–8 张，实测/教程可 7–10 张；只用已清洗的证据图、关键 UI、步骤或数据图，独占一行，不重复、不相邻。
+- 配图按 `过程/brief.md` 图片计划和大纲角色执行。默认深度长文 6–8 张，实测/教程可 7–10 张；只用已清洗的证据图、关键 UI、步骤或数据图，独占一行，不重复、不相邻。
 - 结尾回到读者的现实，做具体开放收束，再使用 Profile 的固定 CTA。
 
 ## 执行
@@ -60,10 +60,12 @@ description: Draft or revise a FlexFox WeChat long-form article after its brief,
 2. 完成初稿后，自查结构合同、事实边界、2–4 处加粗、图片数量、去重、图片与段落间隔，以及每个必写事实是否实际落到正文。
 3. 运行结构门禁；失败则依报告修复缺失章节。最多两轮，仍失败时停止并请求人工决定。
 
+收到 `过程/review.json` 的 `needs_revision` 后，只修复其中点名的位置和必要上下文，不借审稿名义重写整篇。修改完成后不得自行宣称通过；交回独立 reviewer 重新审稿。
+
 ```bash
 python3 scripts/validate_article.py \
   --article articles/YYYY-MM-DD-主题/article.md \
-  --sources articles/YYYY-MM-DD-主题/sources/index.json
+  --sources articles/YYYY-MM-DD-主题/过程/来源/index.json
 ```
 
-通过前不能调用排版、草稿箱或把 `review.md` 写成通过。
+通过前不能调用排版、草稿箱或把 `过程/review.md` 写成通过。

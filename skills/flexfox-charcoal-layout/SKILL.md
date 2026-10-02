@@ -9,19 +9,20 @@ This is a self-contained renderer. It turns the final Markdown into WeChat-compa
 
 ## Preconditions
 
-1. Read the active Profile, `article.md`, `evidence.md`, and `images/manifest.md` if present.
+1. Read the active Profile, `article.md`, `过程/evidence.md`, and `images/manifest.md` if present.
 2. Confirm the title and article text are final. This Skill must not rewrite them.
 3. Read `../../references/charcoal-layout-contract.md` and `../../references/output-contract.md`.
 4. Work in the existing `articles/YYYY-MM-DD-明确主题/` directory.
+5. Run `python3 scripts/pipeline.py preflight --article-dir articles/YYYY-MM-DD-明确主题`. A failed preflight blocks typesetting; do not paper over it by rendering a draft anyway.
 
 ## Prepare the body
 
-The WeChat platform owns the title field, so do not duplicate `# 标题` in the rich-text body. Use the helper to make `wechat-body.md`; it keeps `article.md` unchanged, strips YAML frontmatter and H1, and places the account GIF and greeting first:
+The WeChat platform owns the title field, so do not duplicate `# 标题` in the rich-text body. Use the helper to make `过程/wechat-body.md`; it keeps `article.md` unchanged, strips YAML frontmatter and H1, and places the account GIF and greeting first:
 
 ```bash
 python3 scripts/prepare_wechat_body.py \
   --article articles/YYYY-MM-DD-明确主题/article.md \
-  --output articles/YYYY-MM-DD-明确主题/wechat-body.md \
+  --output articles/YYYY-MM-DD-明确主题/过程/wechat-body.md \
   --require-intro-gif
 ```
 
@@ -34,17 +35,17 @@ For the body that follows the opening:
 - Retain only evidence-bearing body images from the manifest. Images use local relative paths (such as `images/01.png` or `图片/01.png`) or remote `https://` URLs, with meaningful alt text, alone on their own lines, with blank lines before and after.
 - Remove raw base64 data URIs, advertising images and the cover image.
 - During drafting, local relative paths are standard. When pushing to WeChat draft box, `scripts/wechat_draft.py` automatically uploads local images to WeChat's official CDN and substitutes the resulting URLs.
-- The renderer rejects a body image embedded in prose instead of silently publishing Markdown syntax. Fix the source `article.md`, then regenerate `wechat-body.md`.
+- The renderer rejects a body image embedded in prose instead of silently publishing Markdown syntax. Fix the source `article.md`, then regenerate `过程/wechat-body.md`.
 
 ## Render and deliver
 
-`flexfox-wechat-draft` renders `wechat-body.md` directly using `scripts/render_charcoal.py`, uploads local/remote body images to WeChat CDN, and creates the draft. There is no exported HTML file and no clipboard step.
+`flexfox-wechat-draft` renders `过程/wechat-body.md` directly using `scripts/render_charcoal.py`, uploads local/remote body images to WeChat CDN, and creates the draft. There is no exported HTML file and no clipboard step.
 
 Before the first real delivery, inspect the rendered preview or the saved WeChat draft: fixed GIF opening, greeting, normal paragraph, one H2, one H3, one bold phrase, one quote and one image. If WeChat sanitizes a property, fix only that property in the local renderer contract.
 
 ## Deliver
 
-Write `layout-checklist.md` with:
+Write `过程/layout-checklist.md` with:
 
 - renderer `flexfox-charcoal-layout` / style `炭黑商务`;
 - whether direct render succeeded;

@@ -3,6 +3,8 @@
 .vscode/
 articles/
 flexfox-profile.md
+flexfox-profile-private/
+profiles/*-private/
 *.local.md
 config/*.local.env
 __pycache__/

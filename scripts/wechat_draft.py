@@ -148,14 +148,12 @@ def multipart_upload(
     mime: str,
     query: dict[str, str] | None = None,
 ) -> dict:
-    try:
-        import requests
-    except ImportError as error:
-        raise WeChatError("The draft uploader needs requests. Run it with: uv run --with requests python3 scripts/wechat_draft.py …") from error
     params = {"access_token": token}
     if query:
         params.update(query)
+    full_url = f"{url}?{urllib.parse.urlencode(params)}"
     try:
+        import requests
         response = requests.post(
             url,
             params=params,
@@ -163,10 +161,29 @@ def multipart_upload(
             timeout=30,
         )
         result = response.json()
-    except requests.RequestException as error:
+    except ImportError:
+        import uuid
+        boundary = f"----FlexFoxBoundary{uuid.uuid4().hex}"
+        body = bytearray()
+        body.extend(f"--{boundary}\r\n".encode("utf-8"))
+        body.extend(f'Content-Disposition: form-data; name="{field}"; filename="{filename}"\r\n'.encode("utf-8"))
+        body.extend(f"Content-Type: {mime}\r\n\r\n".encode("utf-8"))
+        body.extend(content)
+        body.extend(f"\r\n--{boundary}--\r\n".encode("utf-8"))
+
+        headers = {
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "Content-Length": str(len(body)),
+            "User-Agent": "FlexFox-WeChat-Draft/1.0",
+        }
+        req = urllib.request.Request(full_url, data=bytes(body), headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+        except Exception as error:
+            raise WeChatError(f"WeChat upload request failed: {error}") from error
+    except Exception as error:
         raise WeChatError(f"WeChat upload request failed: {error}") from error
-    except ValueError as error:
-        raise WeChatError("WeChat upload returned invalid JSON") from error
     if result.get("errcode", 0) != 0:
         raise WeChatError(f"WeChat API {result.get('errcode')}: {result.get('errmsg', 'unknown error')}")
     return result
@@ -276,13 +293,19 @@ def receipt(article_dir: Path, media_id: str, html: str, images: int, verified: 
         "body_image_count": images,
         "verified": verified,
     }
-    path = article_dir / "wechat-draft.json"
+    process = article_dir / "过程"
+    if not process.is_dir():
+        process = article_dir
+    path = process / "wechat-draft.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return path
 
 
 def article_digest(article_dir: Path) -> str:
-    path = article_dir / "digest.md"
+    process = article_dir / "过程"
+    if not process.is_dir():
+        process = article_dir
+    path = process / "digest.md"
     if not path.is_file():
         return ""
     lines = [line.strip() for line in path.read_text(encoding="utf-8").splitlines()]
@@ -307,7 +330,10 @@ def command_draft(args: argparse.Namespace, config: dict[str, str]) -> None:
     title = args.title.strip()
     if not title:
         die("Draft title must not be empty.")
-    body = args.body.resolve() if args.body else article_dir / "wechat-body.md"
+    process = article_dir / "过程"
+    if not process.is_dir():
+        process = article_dir
+    body = args.body.resolve() if args.body else process / "wechat-body.md"
     if not body.is_file():
         die(f"No rendered-body source at {body}. Run scripts/prepare_wechat_body.py first.")
     html = render_file(body)

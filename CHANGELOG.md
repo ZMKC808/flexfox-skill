@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+- Add a small artifact-gated production pipeline: evidence, Brief, outline, draft, independent review, targeted rewrite, and delivery preflight.
+- Require a hash-bound `review.json` alongside human-readable `review.md`; changing the body invalidates the old review and requires a second pass.
+- Keep account history in an ignored local Profile overlay so AI飞升录 can use private golden samples without publishing article text, third-party media, source archives, or credentials.
+
 ## 0.7.0
 
 - Remove Gemini/Codex handoff, polling, and external-AI cover relay from the package.

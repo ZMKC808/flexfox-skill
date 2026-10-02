@@ -1,5 +1,7 @@
 # Brief
 
+> 创建项目后先运行 `python3 scripts/pipeline.py init --article-dir <文章目录> --mode guided`。
+
 - 文章成立性（HKR，至少命中两项）：
 - 文章原型（调查实验 / 产品体验 / 现象解读 / 工具分享 / 方法论等）：
 - 读者与处境：

@@ -10,9 +10,10 @@ This Skill delivers one final, already typeset article to the current account's 
 ## Preconditions
 
 1. Read `../../references/wechat-draft-delivery.md`.
-2. Require a final title, final `article.md`, prepared `wechat-body.md`, and `images/cover-900x383.png`.
+2. Require a final title, final `article.md`, prepared `过程/wechat-body.md`, and `images/cover-900x383.png`.
 3. Require either the user's explicit request to push this article to drafts, or an active Profile plus local account config that explicitly enables automatic draft delivery. Do not infer this from a request to merely write or typeset.
 4. Confirm `config/wechat.local.env` is local and ignored. Never display, copy, commit, or transmit its values anywhere except the WeChat API request.
+5. Run `python3 scripts/pipeline.py preflight --article-dir articles/YYYY-MM-DD-明确主题`. A failed preflight blocks draft creation.
 
 ## Deliver
 
@@ -24,7 +25,7 @@ uv run --with requests python3 scripts/wechat_draft.py validate
 
 If WeChat reports `40164 invalid ip`, stop. Tell the account owner to add the IP from that error to the official-account IP whitelist, then retry validation once.
 
-Only after validation succeeds, call the script with the final locked title. It reads the mandatory `digest.md` automatically; pass `--digest` only to override it for this one draft:
+Only after validation succeeds, call the script with the final locked title. It reads the mandatory `过程/digest.md` automatically; pass `--digest` only to override it for this one draft:
 
 ```bash
 uv run --with requests python3 scripts/wechat_draft.py draft \
@@ -34,4 +35,4 @@ uv run --with requests python3 scripts/wechat_draft.py draft \
   --confirm-draft
 ```
 
-The script renders `wechat-body.md` with the local charcoal renderer, uploads body images and the cover, creates exactly one draft, verifies it, and writes `wechat-draft.json`. Do not call it again after a success. Report the receipt path and whether verification succeeded; do not print the media ID unless the user asks.
+The script renders `过程/wechat-body.md` with the local charcoal renderer, uploads body images and the cover, creates exactly one draft, verifies it, and writes `过程/wechat-draft.json`. Do not call it again after a success. Report the receipt path and whether verification succeeded; do not print the media ID unless the user asks.

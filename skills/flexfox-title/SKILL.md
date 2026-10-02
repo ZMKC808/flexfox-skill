@@ -11,7 +11,7 @@ description: Use when generating, researching, selecting, or revising titles for
 
 ## 标题模型（按文章原型选择）
 
-每次基于 `brief.md` 的主线、文章原型和已核验事实输出至少 5 个候选。下面是可选模型，不要求每篇逐一覆盖；没有天然冲突时，不得虚构 A vs B。
+每次基于 `过程/brief.md` 的主线、文章原型和已核验事实输出至少 5 个候选。下面是可选模型，不要求每篇逐一覆盖；没有天然冲突时，不得虚构 A vs B。
 
 ### 1. 利益不对等 / 挑拨型
 - **适用**：材料确有一方公关做派与另一方实际代价的对撞。
@@ -36,7 +36,7 @@ description: Use when generating, researching, selecting, or revising titles for
 
 ---
 
-## 输出规范：`title-options.md`
+## 输出规范：`过程/title-options.md`
 
 ```md
 # 标题研究
@@ -61,9 +61,9 @@ description: Use when generating, researching, selecting, or revising titles for
 
 ---
 
-## 摘要钩子：`digest.md`
+## 摘要钩子：`过程/digest.md`
 
-标题锁定后，立即输出 `digest.md`（直接注入微信草稿箱 API）：
+标题锁定后，立即输出 `过程/digest.md`（直接注入微信草稿箱 API）：
 - 长度严格在 **15–20 个汉字**（硬上限 25 字）；
 - 不做全文长概括，只写一句话悬念或未解决的张力；
 - 严禁空洞的“本文带你了解……”；标题、封面与摘要三位一体促成点击决策。

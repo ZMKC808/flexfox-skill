@@ -20,6 +20,12 @@ CREDENTIAL_VALUE = re.compile(
 MEDIA_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".mp4", ".mov"}
 
 
+def private_profile(path: Path) -> bool:
+    """Exclude ignored account-specific overlays from public-package checks."""
+    relative = path.relative_to(ROOT)
+    return len(relative.parts) > 1 and relative.parts[0] == "profiles" and relative.parts[1].endswith("-private")
+
+
 def fail(message: str) -> None:
     print(f"Validation failed: {message}", file=sys.stderr)
     raise SystemExit(1)
@@ -64,7 +70,7 @@ def main() -> None:
 
     for directory in (SKILLS, ROOT / "references", ROOT / "profiles", ROOT / "assets"):
         for path in directory.rglob("*"):
-            if path.is_file():
+            if path.is_file() and not private_profile(path):
                 text = path.read_text(errors="ignore")
                 if FORBIDDEN.search(text) or CREDENTIAL_VALUE.search(text):
                     fail(f"{path.relative_to(ROOT)} contains a local dependency or credential value")
@@ -73,6 +79,7 @@ def main() -> None:
         if (
             ".git" not in path.parts
             and "articles" not in path.parts
+            and not private_profile(path)
             and path.is_file()
             and path.suffix.lower() in MEDIA_SUFFIXES
         ):

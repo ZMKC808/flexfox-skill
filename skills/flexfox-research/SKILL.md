@@ -7,7 +7,7 @@ description: Use when researching, reading sources, checking claims, or building
 
 Read `../../references/evidence-policy.md`. For linked-source work, also read `../../references/source-contract.md`. Read source material for real; do not summarize a link from memory or a search snippet.
 
-## Produce `evidence.md`
+## Produce `过程/evidence.md`
 
 For the article project, write three sections:
 
@@ -17,7 +17,7 @@ For the article project, write three sections:
 
 Use primary sources for prices, versions, policies, papers, company claims, and product functionality. If a source cannot be read, say what is missing; do not fill the gap with invented precision.
 
-## Produce or update `brief.md`
+## Produce or update `过程/brief.md`
 
 Define:
 

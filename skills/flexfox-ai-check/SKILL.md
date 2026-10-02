@@ -7,15 +7,23 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 
 本模块是文章发布前的质量与人味硬门槛，不是单纯的词语替换。核心目标是剔除 AI 写作特有的“过度工整、光滑、说教与虚假感”，确保文章有血有肉、事实可信、人设立得住。
 
-审查前必须确认同目录 `structure-check.json` 的状态为 `pass`；否则退回 `flexfox-writer`，不得生成“通过”的 `review.md`。审查时读取：当前 Profile、`article.md`、`brief.md`、`evidence.md`。审查结果按出现顺序输出至 `review.md`。
+审查前必须确认 `过程/structure-check.json` 的状态为 `pass`；否则退回 `flexfox-writer`，不得生成“通过”的 `过程/review.md`。审查时读取：当前 Profile、`article.md`、`过程/brief.md`、`过程/evidence.md`。审查结果按出现顺序输出至 `过程/review.md`。
+
+审稿者不是作者的自我表扬器。使用与 writer 独立的一次调用或干净上下文；审稿者**不得修改 `article.md`**。先运行：
+
+```bash
+python3 scripts/pipeline.py status --article-dir articles/YYYY-MM-DD-明确主题
+```
+
+结构未通过时停止。结构通过后，先找问题，再决定是否能通过；不得为了凑“全通过”而把可疑事实、假现场或模板句式解释成优点。
 
 ## 必写事实逐项核验
 
-从 `brief.md` 的「素材关系与关键证据」取出每个 `[必写] E##`。逐条核对它在正文的具体章节/段落、是否保留了证据原意、是否被错误弱化或夸大。必须把核对结果写进 `review.md`：
+从 `过程/brief.md` 的「素材关系与关键证据」取出每个 `[必写] E##`。逐条核对它在正文的具体章节/段落、是否保留了证据原意、是否被错误弱化或夸大。必须把核对结果写进 `过程/review.md`：
 
 ```md
 ## 必写事实落稿核验
-- [通过] E01：在「小标题」第 N 段，正文已说明……；与 evidence.md 一致。
+- [通过] E01：在「小标题」第 N 段，正文已说明……；与 `过程/evidence.md` 一致。
 - [失败] E02：正文缺失；退回补写。
 ```
 
@@ -24,7 +32,7 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 ## 一票否决项（阻断交付硬伤）
 
 - **虚构事实**：凭空捏造亲身经历、测试结果、报错细节、人物对话、虚假数据或伪造官宣；
-- **脱离证据**：正文中的具体数字、价格、限制与 `evidence.md` 冲突；
+- **脱离证据**：正文中的具体数字、价格、限制与 `过程/evidence.md` 冲突；
 - **证据外加戏**：来源未写明的日期、人数、收购、亲历、报错或人物对话被写成确定事实；
 - **开场画饼未兑现**：标题承诺的痛点或收益在正文前 100 字内未开始兑现；
 - **协作痕迹**：出现“正如你所要求的”、“我先写一版”、“你提供的材料”等与大模型的交互对话痕迹。
@@ -60,7 +68,7 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 
 1. 不重复结构门禁已经检查过的字数、标题数和段落数；准确定位事实或文风问题，给出最小修改方案，不整篇推翻重写；
 2. 修复后对整段及上下文重新复检；
-3. 输出格式保存至 `review.md`：
+3. 输出格式保存至 `过程/review.md`：
 
 ```md
 # 编辑与 AI 检查
@@ -83,3 +91,11 @@ description: Use when checking or repairing AI-sounding, templated, overly polis
 - 状态：pass / needs-revision
 - 查重与原创性：结构独立，无连续雷同句式
 ```
+
+同时写入 `过程/review.json`。完整字段与例子见 [生产流水线合同](../../references/pipeline-contract.md)。
+
+- `article_sha256` 必须是当前 `article.md` 的 SHA-256；
+- 每个 `[必写] E##` 都要在 `fact_checks` 标记 `pass` 或 `fail`，并写正文位置与理由；
+- 每个问题都要有 `severity`（`blocker` / `major` / `minor`）、位置、原文短引和最小修复动作；
+- 有任何 blocker 或 major 时，`status` 必须为 `needs_revision`；
+- `pass` 后运行 `python3 scripts/pipeline.py preflight --article-dir articles/YYYY-MM-DD-明确主题`。若正文在审稿后被改动，哈希失效，必须二审。
