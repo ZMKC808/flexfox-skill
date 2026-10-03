@@ -18,6 +18,7 @@ CREDENTIAL_VALUE = re.compile(
     r"(?im)^FLEXFOX_WECHAT_APP(?:ID|SECRET)=(?!\s*$|<[^>]+>$)[^\s#]+"
 )
 MEDIA_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".mp4", ".mov"}
+PACKAGED_MEDIA = {ROOT / "assets" / "flexfox-cover.png"}
 
 
 def private_profile(path: Path) -> bool:
@@ -82,6 +83,7 @@ def main() -> None:
             and not private_profile(path)
             and path.is_file()
             and path.suffix.lower() in MEDIA_SUFFIXES
+            and path not in PACKAGED_MEDIA
         ):
             fail(f"bundled media is not allowed: {path.relative_to(ROOT)}")
 
