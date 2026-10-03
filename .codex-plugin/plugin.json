@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "flexfox-wechat-writing-system",
+  "name": "flexfox-skill",
   "version": "0.8.0",
-  "description": "A modular FlexFox workflow for researched and adapted WeChat Official Account articles, with scraper, digest, a self-contained charcoal layout, and optional draft-box delivery.",
+  "description": "A modular FlexFox content-production Skill. It ships with a researched WeChat Official Account writing workflow, charcoal layout, and optional draft-box delivery.",
   "license": "MIT",
   "keywords": ["wechat", "writing", "chinese", "content", "flexfox"]
 }

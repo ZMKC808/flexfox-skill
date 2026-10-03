@@ -44,7 +44,7 @@ def frontmatter(text: str, path: Path) -> dict[str, object]:
 
 def main() -> None:
     manifest = json.loads((ROOT / "plugin.json").read_text())
-    if manifest.get("name") != "flexfox-wechat-writing-system":
+    if manifest.get("name") != "flexfox-skill":
         fail("plugin.json has an unexpected package name")
 
     plugin_manifest = json.loads((ROOT / ".codex-plugin/plugin.json").read_text())

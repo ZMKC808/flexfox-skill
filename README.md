@@ -2,9 +2,9 @@
   <img src="assets/flexfox-cover.png" alt="FlexFox：从素材到公众号草稿箱的写作流水线" width="100%" />
 </p>
 
-# FlexFox 公众号写作系统
+# FlexFox Skill
 
-把一堆链接、截图和零散想法，做成一篇能审、能排、能进公众号草稿箱的文章。
+FlexFox 的第一个内容生产模块：把一堆链接、截图和零散想法，做成一篇能审、能排、能进公众号草稿箱的文章。
 
 它不是“丢素材，一次出终稿”的提示词。FlexFox 把容易跑偏的地方拆开：先核事实，再定主线，写完由独立审稿检查，最后才排版和投递。文章可以像你的账号，事实不能像你的想象。
 
@@ -39,8 +39,8 @@
 ### 1. 获取并检查
 
 ```bash
-git clone https://github.com/ZMKC808/flexfox-wechat-writing-system.git
-cd flexfox-wechat-writing-system
+git clone https://github.com/ZMKC808/flexfox-skill.git
+cd flexfox-skill
 bash scripts/validate.sh
 ```
 
@@ -65,7 +65,7 @@ flexfox-profile-private/
 ### 3. 把这段话交给 AI
 
 ```text
-工作区：/你的/flexfox-wechat-writing-system
+工作区：/你的/flexfox-skill
 请先读 AGENTS.md，按 FlexFox 流水线完成一篇公众号文章。
 模式：guided
 素材：
