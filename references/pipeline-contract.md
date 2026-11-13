@@ -9,7 +9,7 @@
 3. **大纲**：在 `过程/outline.md` 将每条必写事实放进对应章节，决定信息轻重；不能用固定故事模板替代编辑判断。
 4. **初稿**：只由 writer 修改 `article.md`。
 5. **独立审稿**：reviewer 不改正文，只写 `过程/review.md` 与 `过程/review.json`。它必须审查事实、开头兑现、叙事轻重、AI 指纹和读者可读性。
-6. **定点返工**：writer 仅处理审稿问题。正文一旦修改，旧 `过程/review.json` 因哈希不匹配自动失效，必须二审。
+6. **定点返工**：writer 仅处理审稿问题。返工只做减法与原位微调（删句、并句、换词），不新增段落、比喻或观点；确需新增内容时退回大纲环节重排，不允许在返工中扩写。正文一旦修改，旧 `过程/review.json` 因哈希不匹配自动失效，必须二审。
 7. **交付**：`pipeline.py preflight` 通过后才可排版或创建微信草稿。
 
 最多两轮“审稿 → 返工”。第二轮仍有 blocker 或 major 问题时，停止自动投递并请人工决定。
@@ -36,9 +36,9 @@
 ## 命令
 
 ```bash
-python3 scripts/pipeline.py init --article-dir articles/YYYY-MM-DD-明确主题 --mode guided
-python3 scripts/pipeline.py status --article-dir articles/YYYY-MM-DD-明确主题
-python3 scripts/pipeline.py preflight --article-dir articles/YYYY-MM-DD-明确主题
+python3 scripts/pipeline.py init --article-dir 文章/YYYY-MM-DD-明确主题 --mode guided
+python3 scripts/pipeline.py status --article-dir 文章/YYYY-MM-DD-明确主题
+python3 scripts/pipeline.py preflight --article-dir 文章/YYYY-MM-DD-明确主题
 ```
 
 `status` 会重跑结构门禁；初稿合格但尚未审稿时返回 `ready_for_review`。`preflight` 额外要求审稿状态为 `pass`。这两个命令不生成或重写文章正文。

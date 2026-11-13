@@ -13,7 +13,7 @@ description: Turn one or more WeChat, X/Twitter, or other supported source links
 
    ```bash
    python3 scripts/fetch_source.py <URL1> <URL2> ... \
-     -o articles/YYYY-MM-DD-主题/过程/来源
+     -o 文章/YYYY-MM-DD-主题/过程/来源
    ```
 
 2. 检查 `过程/来源/index.json`。存在失败来源时，先补源、换链接或在 `过程/brief.md` 说明为何排除；不能直接继续。

@@ -38,8 +38,18 @@
 
 ```bash
 python3 scripts/validate_article.py \
-  --article articles/YYYY-MM-DD-主题/article.md \
-  --sources articles/YYYY-MM-DD-主题/过程/来源/index.json
+  --article 文章/YYYY-MM-DD-主题/article.md \
+  --sources 文章/YYYY-MM-DD-主题/过程/来源/index.json
 ```
 
 脚本会生成 `过程/structure-check.json` 和 `过程/structure-check.md`。只有状态为 `pass`，才能进入 `flexfox-ai-check`、排版和草稿箱。失败时只按报告修复缺失章节或重建大纲；连续两次失败，停止自动推进并请求人工决定。
+
+
+## 用户明确要求瀑布流时的段落例外
+
+用户明确要求短句短段、瀑布流时，显示段落可以拆开，不得为了每节3–5块的默认预算压成长段。先在本篇 `过程/brief.md` 记录用户原话及确认依据，再用 `过程/structure-policy.json` 记录 `min_paragraphs`、`max_paragraphs` 与非空 `reason`；支持范围为1–40。未配置时仍执行默认3–5。该例外只调整段落显示数量，不豁免事实、字数、审稿、图片或哈希检查。
+
+用户明确要求逐项分节的合集时，在本篇 Brief 记录确认依据，并在同一 policy 文件配置 `min_sections` / `max_sections`（1–20）；未配置仍为3–5节。经用户确认的短稿篇幅可用 `min_han` / `max_han` 记录。例外只作用于该篇，不改变其他文章的默认门槛，也不豁免证据、独立审稿与版本哈希。
+
+
+结构例外应在写作前按用户任务确定。若删冗余造成篇幅变化，应先核对是否仍符合用户确认的体裁与内容预算；不可仅为让门禁变绿而下调字数、段落或图片门槛。

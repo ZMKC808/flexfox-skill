@@ -111,6 +111,30 @@ def structure_gate(article_dir: Path) -> tuple[bool, str]:
         return False, "缺少 article.md"
     command = [sys.executable, str(Path(__file__).with_name("validate_article.py")), "--article", str(article)]
     process = process_dir(article_dir)
+    policy_path = process / "structure-policy.json"
+    if policy_path.is_file():
+        try:
+            policy = json.loads(policy_path.read_text(encoding="utf-8"))
+            if not isinstance(policy, dict) or not isinstance(policy.get("reason"), str) or not policy["reason"].strip():
+                return False, "结构例外必须记录用户要求的原因"
+            low, high = policy.get("min_paragraphs", 3), policy.get("max_paragraphs", 5)
+            if type(low) is not int or type(high) is not int or not 1 <= low <= high <= 40:
+                return False, "段落例外范围必须满足 1 <= min <= max <= 40"
+            command.extend(["--min-paragraphs", str(low), "--max-paragraphs", str(high)])
+            section_low, section_high = policy.get("min_sections", 3), policy.get("max_sections", 5)
+            if type(section_low) is not int or type(section_high) is not int or not 1 <= section_low <= section_high <= 20:
+                return False, "章节例外范围必须满足 1 <= min <= max <= 20"
+            command.extend(["--min-sections", str(section_low), "--max-sections", str(section_high)])
+            if "min_han" in policy:
+                command.extend(["--min-han", str(policy["min_han"])])
+            if "max_han" in policy:
+                command.extend(["--max-han", str(policy["max_han"])])
+            image_low, image_high = policy.get("min_images", 6), policy.get("max_images", 10)
+            if type(image_low) is not int or type(image_high) is not int or not 1 <= image_low <= image_high <= 30:
+                return False, "图片例外范围必须满足 1 <= min <= max <= 30"
+            command.extend(["--min-images", str(image_low), "--max-images", str(image_high)])
+        except (OSError, json.JSONDecodeError) as exc:
+            return False, f"结构例外无法读取：{exc}"
     source_index = process / "来源" / "index.json"
     if not source_index.is_file():
         source_index = article_dir / "sources" / "index.json"

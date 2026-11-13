@@ -34,7 +34,7 @@ FlexFox 的第一个内容生产模块：把一堆链接、截图和零散想法
 只需要做四件事：
 
 1. 给素材：链接、截图、核心观点，或者一句“我想写这个”。
-2. 选模式：默认 `guided`，AI 做完 Brief 会等你确认；你已经给出清晰主线时才用 `auto`。
+2. 选模式：默认 `guided`，AI 做完 Brief 会等你确认；只有你明确要求跳过 Brief 确认时才用 `auto`。
 3. 写一次账号配置：你的读者、口吻、禁语、CTA、封面和排版偏好。
 4. 想进草稿箱时，再填本机微信配置；不填也能完整产出文章和排版稿。
 
@@ -50,7 +50,7 @@ cd flexfox-skill
 bash scripts/validate.sh
 ```
 
-需要 Python 3.9+；`validate.sh` 需要 [uv](https://docs.astral.sh/uv/)。不运行校验也可以先让 AI 按 `AGENTS.md` 写稿。
+需要 Python 3.10+；`validate.sh` 需要 [uv](https://docs.astral.sh/uv/)。不运行校验也可以先让 AI 按 `AGENTS.md` 写稿。
 
 ### 2. 配置你的账号
 
@@ -106,6 +106,10 @@ flowchart LR
 
 结构门禁会检查字数、小标题、语义块、图片间隔、重复图、必写事实和审稿回执。它只拦截明确错误；“好不好看、像不像你”仍由 Profile、黄金样本和独立审稿负责。
 
+## 当前工作区运行入口
+
+本机运行与检查命令见 [运行说明](运行环境/排版与微信草稿.md)。优先使用该入口；它优先使用 `.venv`，其次使用系统 Python，也支持 `FLEXFOX_PYTHON` 指定解释器。旧工作区内容不随公开包分发，规则冲突时以 AGENTS.md 和新版合同为准。
+
 ## 可选：创建公众号草稿
 
 先复制配置模板，不要把真实密钥提交到仓库：
@@ -124,7 +128,7 @@ uv run --with requests python3 scripts/wechat_draft.py validate
 
 ```bash
 uv run --with requests python3 scripts/wechat_draft.py draft \
-  --article-dir articles/YYYY-MM-DD-主题 \
+  --article-dir 文章/YYYY-MM-DD-主题 \
   --title "终审标题" \
   --confirm-draft
 ```
@@ -134,7 +138,7 @@ uv run --with requests python3 scripts/wechat_draft.py draft \
 ## 产物长什么样
 
 ```text
-articles/YYYY-MM-DD-主题/
+文章/YYYY-MM-DD-主题/
 ├── article.md          # 唯一正文母本
 ├── 转发词.md            # 固定槽位替换后的转发文案
 ├── images/             # 证据图、封面、图片清单
@@ -154,3 +158,10 @@ assets/       # Profile 与配置模板
 ```
 
 默认 Profile 是 AI飞升录的公开版。其他人使用时只需替换 `flexfox-profile.md`；不需要复制你的历史文章、图片、密钥或本机 Skill。
+
+
+## 同步到公开仓库
+
+只提交可复用的规则、脚本、配置模板与脱敏示例。`文章/`、`资料库/`、`交付/`、个人 Profile、账号环境文件及历史抓取素材留在本机；第三方榜单 Skill 不作为本包默认依赖。Gemini 写作、Codex 操作工具是可选个人分工，不是安装前提。
+
+当前 CLI 支持新建草稿与回读，不含通用的原草稿更新入口。遇到既有回执先核对草稿箱，不删除回执后重新创建。需要覆盖原草稿时，须明确授权，并核对目标草稿、终审正文及更新后的全文；该能力尚待独立接口与测试集成。

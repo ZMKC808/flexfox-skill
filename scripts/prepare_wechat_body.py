@@ -53,6 +53,28 @@ def validate_image_sources(markdown: str) -> None:
         raise SystemExit("Error: body images should not be raw base64 data URIs. Use local paths (e.g. images/01.png) or remote URLs.")
 
 
+def prepare_body(markdown: str, config: dict[str, str], *, require_intro_gif: bool = True) -> str:
+    gif_url = config.get("FLEXFOX_WECHAT_INTRO_GIF_URL", "")
+    if require_intro_gif and not gif_url.startswith(("https://", "http://")):
+        raise SystemExit("Error: this account requires an opening GIF. Set FLEXFOX_WECHAT_INTRO_GIF_URL in local config.")
+    body = body_without_title(markdown)
+    if not body:
+        raise SystemExit("Error: article has no body after its title.")
+    validate_image_sources(body)
+
+    header_parts = []
+    if gif_url.startswith("https://") or gif_url.startswith("http://"):
+        header_parts.append(f"![AI飞升录开场动图]({gif_url})\n")
+    # Writers may already include the account greeting, with different punctuation.
+    normalize = lambda text: re.sub(r"\s+", "", text).rstrip("，。,.！!").casefold()
+    first_line = body.splitlines()[0].strip()
+    if normalize(first_line) != normalize(OPENING):
+        header_parts.append(f"{OPENING}\n")
+
+    prefix = "\n".join(header_parts)
+    return f"{prefix}\n{body.rstrip()}\n"
+
+
 def main() -> None:
     root = Path(__file__).resolve().parent.parent
     parser = argparse.ArgumentParser(description=__doc__)
@@ -76,19 +98,7 @@ def main() -> None:
             "Error: this account requires an opening GIF. Set FLEXFOX_WECHAT_INTRO_GIF_URL in local config "
             "or run scripts/sync_intro_gif.py first."
         )
-    markdown = args.article.read_text(encoding="utf-8")
-    body = body_without_title(markdown)
-    if not body:
-        raise SystemExit("Error: article has no body after its title.")
-    validate_image_sources(body)
-
-    header_parts = []
-    if gif_url.startswith("https://") or gif_url.startswith("http://"):
-        header_parts.append(f"![AI飞升录开场动图]({gif_url})\n")
-    header_parts.append(f"{OPENING}\n")
-
-    prefix = "\n".join(header_parts)
-    output = f"{prefix}\n{body.rstrip()}\n"
+    output = prepare_body(args.article.read_text(encoding="utf-8"), config, require_intro_gif=True)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(output, encoding="utf-8")
     print(f"Prepared WeChat body: {args.output}")

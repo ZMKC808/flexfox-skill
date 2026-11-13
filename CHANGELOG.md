@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.0
+
+- Sync the 27-point prose review, fixed forward-copy template, and short-paragraph structure policies.
+- Preserve user-locked wording and check concrete expression instead of relying on scores or keyword scans.
+- Add local preview and delivery diagnostics; block stale bodies and duplicate draft attempts before upload.
+- Add delivery guard tests to the validation entry point and retain existing GitHub CI/plugin metadata.
+- Exclude Chinese article workspaces, private archives and runtime artifacts from the public package.
+- Add a portable Python launcher and document the existing-draft update capability as pending integration.
+
+## 0.8.1
+
+- Lock the AI飞升录 forward-copy template in `profiles/ai-feishenglu.md` to the approved 5-segment skeleton: only 【slot】 content may change per article; segment count, line breaks, and fixed phrases are frozen. Evidence-attribution rules remain enforced via verb-slot substitution (实测了/梳理了).
+- Retire the legacy 4-style share-copy templates in `系统/08-朋友圈与社群转发词模板.md`; the locked 5-segment template in the Profile is now the only forward-copy template, reused for group/community sharing instead of per-context variants.
+
 ## 0.8.0
 
 - Add a small artifact-gated production pipeline: evidence, Brief, outline, draft, independent review, targeted rewrite, and delivery preflight.

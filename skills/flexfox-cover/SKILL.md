@@ -20,3 +20,6 @@ Use the current environment's native image-generation ability directly. Generate
 Do not create `cover-prompt.md`, and do not relay the prompt or asset to another AI provider. If native image generation is unavailable, report the cover as incomplete and stop the cover step rather than creating a prompt-only substitute.
 
 Record in `images/manifest.md` that the cover is not inserted into `article.md`.
+
+
+Keep the illustration compact, around the central half of the frame, with generous empty black margins on all sides. Do not enlarge the subject to fill the canvas. Inspect the final 900×383 image, not only the original generation.

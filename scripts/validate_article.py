@@ -142,7 +142,15 @@ def main() -> None:
     parser.add_argument("--max-han", type=int, default=3000)
     parser.add_argument("--min-images", type=int, default=6)
     parser.add_argument("--max-images", type=int, default=10)
+    parser.add_argument("--min-paragraphs", type=int, default=3)
+    parser.add_argument("--max-paragraphs", type=int, default=5)
+    parser.add_argument("--min-sections", type=int, default=3)
+    parser.add_argument("--max-sections", type=int, default=5)
     args = parser.parse_args()
+    if not 1 <= args.min_sections <= args.max_sections <= 20:
+        parser.error("section bounds must satisfy 1 <= min <= max <= 20")
+    if not 1 <= args.min_paragraphs <= args.max_paragraphs:
+        parser.error("paragraph bounds must satisfy 1 <= min <= max")
 
     article = args.article.resolve()
     if not article.is_file():
@@ -173,8 +181,8 @@ def main() -> None:
         },
         {
             "name": "二级小标题数量",
-            "passed": 3 <= len(headings) <= 5,
-            "detail": f"{len(headings)} 个；要求 3–5 个",
+            "passed": args.min_sections <= len(headings) <= args.max_sections,
+            "detail": f"{len(headings)} 个；要求 {args.min_sections}–{args.max_sections} 个",
         },
         {
             "name": "二级小标题长度",
@@ -183,8 +191,8 @@ def main() -> None:
         },
         {
             "name": "小节语义块数",
-            "passed": len(paragraph_counts) == len(headings) and all(3 <= count <= 5 for count in paragraph_counts),
-            "detail": f"{paragraph_counts}；要求每节 3–5 个空行分隔的语义块，图片不计入",
+            "passed": len(paragraph_counts) == len(headings) and all(args.min_paragraphs <= count <= args.max_paragraphs for count in paragraph_counts),
+            "detail": f"{paragraph_counts}；要求每节 {args.min_paragraphs}–{args.max_paragraphs} 个空行分隔的段落，图片不计入",
         },
         {
             "name": "加粗数量",

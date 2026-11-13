@@ -56,6 +56,13 @@ def main() -> None:
         assert "https://example.com/intro.gif" in body
         assert "👋哈喽大家好，我是ai领航员小陆，" in body
         assert "# 测试标题" not in body
+        for greeting in ("👋哈喽大家好，我是ai领航员小陆，", "👋哈喽大家好，我是ai领航员小陆。"):
+            article.write_text(greeting + "\n\n正文。\n", encoding="utf-8")
+            result = run("--article", str(article), "--output", str(output), "--config", str(config), "--require-intro-gif")
+            assert result.returncode == 0, result.stderr
+            prepared_body = output.read_text(encoding="utf-8")
+            assert prepared_body.count("我是ai领航员小陆") == 1
+            assert greeting in prepared_body
     print("WeChat body preparation tests passed.")
 
 

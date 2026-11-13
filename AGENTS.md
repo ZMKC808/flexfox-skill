@@ -12,3 +12,8 @@ Create a named article directory and run `python3 scripts/pipeline.py init --art
 The non-negotiable order is: evidence → Brief → outline → writer → `pipeline.py status` → independent reviewer → targeted rewrite when needed → second reviewer → `pipeline.py preflight` → layout/draft.
 
 `article.md` is the sole prose source. All working files live under `过程/`; only `article.md`、`转发词.md` and `images/` remain at the article root. A reviewer never edits the prose; a writer never self-certifies its review. Do not create a WeChat draft or publish unless `preflight` passes and the user has authorized draft delivery.
+
+
+## Workspace defaults
+
+New article projects use `文章/YYYY-MM-DD-主题/`. Keep paragraphs short and separated by blank lines. Respect the active Profile and user-confirmed original wording. Record justified structure exceptions in the Brief before writing; do not lower thresholds merely to make a failed draft pass. Writer and reviewer may use the user's chosen models in independent calls; no particular provider is required.

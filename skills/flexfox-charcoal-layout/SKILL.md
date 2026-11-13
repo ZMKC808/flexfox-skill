@@ -12,8 +12,8 @@ This is a self-contained renderer. It turns the final Markdown into WeChat-compa
 1. Read the active Profile, `article.md`, `过程/evidence.md`, and `images/manifest.md` if present.
 2. Confirm the title and article text are final. This Skill must not rewrite them.
 3. Read `../../references/charcoal-layout-contract.md` and `../../references/output-contract.md`.
-4. Work in the existing `articles/YYYY-MM-DD-明确主题/` directory.
-5. Run `python3 scripts/pipeline.py preflight --article-dir articles/YYYY-MM-DD-明确主题`. A failed preflight blocks typesetting; do not paper over it by rendering a draft anyway.
+4. Work in the existing `文章/YYYY-MM-DD-明确主题/` directory.
+5. Run `python3 scripts/pipeline.py preflight --article-dir 文章/YYYY-MM-DD-明确主题`. A failed preflight blocks typesetting; do not paper over it by rendering a draft anyway.
 
 ## Prepare the body
 
@@ -21,8 +21,8 @@ The WeChat platform owns the title field, so do not duplicate `# 标题` in the 
 
 ```bash
 python3 scripts/prepare_wechat_body.py \
-  --article articles/YYYY-MM-DD-明确主题/article.md \
-  --output articles/YYYY-MM-DD-明确主题/过程/wechat-body.md \
+  --article 文章/YYYY-MM-DD-明确主题/article.md \
+  --output 文章/YYYY-MM-DD-明确主题/过程/wechat-body.md \
   --require-intro-gif
 ```
 

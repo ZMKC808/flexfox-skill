@@ -13,7 +13,7 @@ This Skill delivers one final, already typeset article to the current account's 
 2. Require a final title, final `article.md`, prepared `过程/wechat-body.md`, and `images/cover-900x383.png`.
 3. Require either the user's explicit request to push this article to drafts, or an active Profile plus local account config that explicitly enables automatic draft delivery. Do not infer this from a request to merely write or typeset.
 4. Confirm `config/wechat.local.env` is local and ignored. Never display, copy, commit, or transmit its values anywhere except the WeChat API request.
-5. Run `python3 scripts/pipeline.py preflight --article-dir articles/YYYY-MM-DD-明确主题`. A failed preflight blocks draft creation.
+5. Run `python3 scripts/pipeline.py preflight --article-dir 文章/YYYY-MM-DD-明确主题`. A failed preflight blocks draft creation.
 
 ## Deliver
 
@@ -29,7 +29,7 @@ Only after validation succeeds, call the script with the final locked title. It 
 
 ```bash
 uv run --with requests python3 scripts/wechat_draft.py draft \
-  --article-dir articles/YYYY-MM-DD-明确主题 \
+  --article-dir 文章/YYYY-MM-DD-明确主题 \
   --title "最终标题" \
   --digest "可选摘要" \
   --confirm-draft

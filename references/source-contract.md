@@ -5,7 +5,7 @@
 所有链接都放在文章目录下的 `过程/来源/`，不再混用 `source/`、`source_1/` 或根目录散落文件。
 
 ```text
-articles/YYYY-MM-DD-主题/
+文章/YYYY-MM-DD-主题/
 ├── 过程/
 │   ├── evidence.md
 │   └── 来源/
@@ -21,7 +21,7 @@ articles/YYYY-MM-DD-主题/
 
 ```bash
 python3 scripts/fetch_source.py <URL1> <URL2> ... \
-  -o articles/YYYY-MM-DD-主题/过程/来源
+  -o 文章/YYYY-MM-DD-主题/过程/来源
 ```
 
 `index.json` 是来源账本。每个输入链接都必须有 `S01`、`S02` 等编号和 `success` 或 `failed` 状态。任何失败都不能被静默忽略：补充素材、换可访问链接，或在 `过程/brief.md` 记录明确排除原因。

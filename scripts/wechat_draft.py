@@ -336,6 +336,12 @@ def command_draft(args: argparse.Namespace, config: dict[str, str]) -> None:
     body = args.body.resolve() if args.body else process / "wechat-body.md"
     if not body.is_file():
         die(f"No rendered-body source at {body}. Run scripts/prepare_wechat_body.py first.")
+    from wechat_delivery_check import inspect
+    errors = inspect(article_dir, config=config, body_path=body,
+                     cover_path=args.cover.resolve() if args.cover else None,
+                     digest_override=args.digest)
+    if errors:
+        die("投递检查未通过：\n" + "\n".join(errors))
     html = render_file(body)
     token, _ = access_token(config)
     rendered, image_count = replace_images(token, html, base_dir=article_dir)
@@ -346,6 +352,10 @@ def command_draft(args: argparse.Namespace, config: dict[str, str]) -> None:
                 cover = candidate_cover
                 break
     cover_media_id = upload_cover(token, cover)
+    attempt = process / "wechat-draft-attempt.json"
+    with attempt.open("x", encoding="utf-8") as handle:
+        json.dump({"status": "pending", "article_sha256": hashlib.sha256((article_dir / "article.md").read_bytes()).hexdigest(),
+                   "started_at": datetime.now(timezone.utc).isoformat()}, handle)
     media_id = create_draft(
         token,
         title=title,
